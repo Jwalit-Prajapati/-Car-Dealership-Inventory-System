@@ -88,4 +88,8 @@ public class Vehicle {
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
+
+    public void addStock(int amount) {
+        this.quantity = this.quantity + amount;
+    }
 }
