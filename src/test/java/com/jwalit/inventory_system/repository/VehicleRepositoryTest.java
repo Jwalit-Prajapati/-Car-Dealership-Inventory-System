@@ -119,10 +119,10 @@ class VehicleRepositoryTest {
         assertThat(result.getContent()).hasSize(1);
     }
 
-    // ── Inventory stats count tests ────────────────────────────────────────────
+    // ── Inventory stats JPQL projection tests ─────────────────────────────────
 
     @Test
-    void count_returnsCorrectTotalVehicleCount() {
+    void getInventoryStatistics_mixedInventory_returnsCorrectCounts() {
         Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("25000")); v1.setQuantity(10);
         Vehicle v2 = new Vehicle(); v2.setMake("Honda"); v2.setModel("Civic"); v2.setCategory("Sedan"); v2.setPrice(new BigDecimal("20000")); v2.setQuantity(3);
         Vehicle v3 = new Vehicle(); v3.setMake("Ford"); v3.setModel("Focus"); v3.setCategory("Hatchback"); v3.setPrice(new BigDecimal("18000")); v3.setQuantity(0);
@@ -130,42 +130,47 @@ class VehicleRepositoryTest {
         vehicleRepository.save(v2);
         vehicleRepository.save(v3);
 
-        long total = vehicleRepository.count();
+        com.jwalit.inventory_system.dto.InventoryStatsDto stats = vehicleRepository.getInventoryStatistics();
 
-        assertThat(total).isEqualTo(3L);
+        assertThat(stats.getTotalVehicles()).isEqualTo(3L);
+        assertThat(stats.getLowStockVehicles()).isEqualTo(2L);  // quantity 3 and 0 are < 5
+        assertThat(stats.getOutOfStockVehicles()).isEqualTo(1L); // only quantity 0
     }
 
     @Test
-    void countByQuantityLessThan_returnsLowStockCount() {
+    void getInventoryStatistics_emptyRepository_returnsAllZeros() {
+        com.jwalit.inventory_system.dto.InventoryStatsDto stats = vehicleRepository.getInventoryStatistics();
+
+        assertThat(stats.getTotalVehicles()).isEqualTo(0L);
+        assertThat(stats.getLowStockVehicles()).isEqualTo(0L);
+        assertThat(stats.getOutOfStockVehicles()).isEqualTo(0L);
+    }
+
+    @Test
+    void getInventoryStatistics_allInStock_returnsZeroLowAndOutOfStock() {
         Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("25000")); v1.setQuantity(10);
-        Vehicle v2 = new Vehicle(); v2.setMake("Honda"); v2.setModel("Civic"); v2.setCategory("Sedan"); v2.setPrice(new BigDecimal("20000")); v2.setQuantity(3);
-        Vehicle v3 = new Vehicle(); v3.setMake("Ford"); v3.setModel("Focus"); v3.setCategory("Hatchback"); v3.setPrice(new BigDecimal("18000")); v3.setQuantity(0);
+        Vehicle v2 = new Vehicle(); v2.setMake("Honda"); v2.setModel("Civic"); v2.setCategory("Sedan"); v2.setPrice(new BigDecimal("20000")); v2.setQuantity(20);
         vehicleRepository.save(v1);
         vehicleRepository.save(v2);
-        vehicleRepository.save(v3);
 
-        long lowStock = vehicleRepository.countByQuantityLessThan(5);
+        com.jwalit.inventory_system.dto.InventoryStatsDto stats = vehicleRepository.getInventoryStatistics();
 
-        assertThat(lowStock).isEqualTo(2L);
+        assertThat(stats.getTotalVehicles()).isEqualTo(2L);
+        assertThat(stats.getLowStockVehicles()).isEqualTo(0L);
+        assertThat(stats.getOutOfStockVehicles()).isEqualTo(0L);
     }
 
     @Test
-    void countByQuantity_returnsOutOfStockCount() {
-        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("25000")); v1.setQuantity(10);
+    void getInventoryStatistics_allOutOfStock_returnsAllAsLowAndOutOfStock() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("25000")); v1.setQuantity(0);
         Vehicle v2 = new Vehicle(); v2.setMake("Honda"); v2.setModel("Civic"); v2.setCategory("Sedan"); v2.setPrice(new BigDecimal("20000")); v2.setQuantity(0);
-        Vehicle v3 = new Vehicle(); v3.setMake("Ford"); v3.setModel("Focus"); v3.setCategory("Hatchback"); v3.setPrice(new BigDecimal("18000")); v3.setQuantity(0);
         vehicleRepository.save(v1);
         vehicleRepository.save(v2);
-        vehicleRepository.save(v3);
 
-        long outOfStock = vehicleRepository.countByQuantity(0);
+        com.jwalit.inventory_system.dto.InventoryStatsDto stats = vehicleRepository.getInventoryStatistics();
 
-        assertThat(outOfStock).isEqualTo(2L);
-    }
-
-    @Test
-    void count_emptyRepository_returnsZero() {
-        long total = vehicleRepository.count();
-        assertThat(total).isEqualTo(0L);
+        assertThat(stats.getTotalVehicles()).isEqualTo(2L);
+        assertThat(stats.getLowStockVehicles()).isEqualTo(2L);
+        assertThat(stats.getOutOfStockVehicles()).isEqualTo(2L);
     }
 }

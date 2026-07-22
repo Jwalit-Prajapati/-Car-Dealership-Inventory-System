@@ -16,9 +16,6 @@ public class InventoryStatsServiceImpl implements InventoryStatsService {
 
     @Override
     public InventoryStatsDto getInventoryStats() {
-        long total = vehicleRepository.count();
-        long lowStock = vehicleRepository.countByQuantityLessThan(5);
-        long outOfStock = vehicleRepository.countByQuantity(0);
-        return new InventoryStatsDto(total, lowStock, outOfStock);
+        return vehicleRepository.getInventoryStatistics();
     }
 }

@@ -24,26 +24,21 @@ class InventoryStatsServiceTest {
 
     @Test
     void getInventoryStats_returnsCorrectlyMappedDto() {
-        when(vehicleRepository.count()).thenReturn(125L);
-        when(vehicleRepository.countByQuantityLessThan(5)).thenReturn(18L);
-        when(vehicleRepository.countByQuantity(0)).thenReturn(6L);
+        InventoryStatsDto projected = new InventoryStatsDto(125L, 18L, 6L);
+        when(vehicleRepository.getInventoryStatistics()).thenReturn(projected);
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
         assertThat(result.getTotalVehicles()).isEqualTo(125L);
         assertThat(result.getLowStockVehicles()).isEqualTo(18L);
         assertThat(result.getOutOfStockVehicles()).isEqualTo(6L);
-
-        verify(vehicleRepository).count();
-        verify(vehicleRepository).countByQuantityLessThan(5);
-        verify(vehicleRepository).countByQuantity(0);
+        verify(vehicleRepository).getInventoryStatistics();
     }
 
     @Test
     void getInventoryStats_emptyInventory_returnsAllZeros() {
-        when(vehicleRepository.count()).thenReturn(0L);
-        when(vehicleRepository.countByQuantityLessThan(5)).thenReturn(0L);
-        when(vehicleRepository.countByQuantity(0)).thenReturn(0L);
+        InventoryStatsDto projected = new InventoryStatsDto(0L, 0L, 0L);
+        when(vehicleRepository.getInventoryStatistics()).thenReturn(projected);
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
@@ -54,9 +49,8 @@ class InventoryStatsServiceTest {
 
     @Test
     void getInventoryStats_allInStock_returnsZeroLowAndOutOfStock() {
-        when(vehicleRepository.count()).thenReturn(50L);
-        when(vehicleRepository.countByQuantityLessThan(5)).thenReturn(0L);
-        when(vehicleRepository.countByQuantity(0)).thenReturn(0L);
+        InventoryStatsDto projected = new InventoryStatsDto(50L, 0L, 0L);
+        when(vehicleRepository.getInventoryStatistics()).thenReturn(projected);
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
@@ -67,9 +61,8 @@ class InventoryStatsServiceTest {
 
     @Test
     void getInventoryStats_allLowStock_returnsCorrectCounts() {
-        when(vehicleRepository.count()).thenReturn(10L);
-        when(vehicleRepository.countByQuantityLessThan(5)).thenReturn(10L);
-        when(vehicleRepository.countByQuantity(0)).thenReturn(0L);
+        InventoryStatsDto projected = new InventoryStatsDto(10L, 10L, 0L);
+        when(vehicleRepository.getInventoryStatistics()).thenReturn(projected);
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
@@ -80,9 +73,8 @@ class InventoryStatsServiceTest {
 
     @Test
     void getInventoryStats_allOutOfStock_returnsCorrectCounts() {
-        when(vehicleRepository.count()).thenReturn(8L);
-        when(vehicleRepository.countByQuantityLessThan(5)).thenReturn(8L);
-        when(vehicleRepository.countByQuantity(0)).thenReturn(8L);
+        InventoryStatsDto projected = new InventoryStatsDto(8L, 8L, 8L);
+        when(vehicleRepository.getInventoryStatistics()).thenReturn(projected);
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
@@ -93,9 +85,8 @@ class InventoryStatsServiceTest {
 
     @Test
     void getInventoryStats_mixedInventory_returnsCorrectCounts() {
-        when(vehicleRepository.count()).thenReturn(100L);
-        when(vehicleRepository.countByQuantityLessThan(5)).thenReturn(25L);
-        when(vehicleRepository.countByQuantity(0)).thenReturn(10L);
+        InventoryStatsDto projected = new InventoryStatsDto(100L, 25L, 10L);
+        when(vehicleRepository.getInventoryStatistics()).thenReturn(projected);
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
@@ -105,15 +96,11 @@ class InventoryStatsServiceTest {
     }
 
     @Test
-    void getInventoryStats_invokesAllThreeRepositoryMethods() {
-        when(vehicleRepository.count()).thenReturn(1L);
-        when(vehicleRepository.countByQuantityLessThan(5)).thenReturn(1L);
-        when(vehicleRepository.countByQuantity(0)).thenReturn(0L);
+    void getInventoryStats_invokesProjectionMethodOnce() {
+        when(vehicleRepository.getInventoryStatistics()).thenReturn(new InventoryStatsDto(1L, 1L, 0L));
 
         inventoryStatsService.getInventoryStats();
 
-        verify(vehicleRepository).count();
-        verify(vehicleRepository).countByQuantityLessThan(5);
-        verify(vehicleRepository).countByQuantity(0);
+        verify(vehicleRepository).getInventoryStatistics();
     }
 }
