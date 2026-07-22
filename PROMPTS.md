@@ -1053,3 +1053,33 @@ Phase 1 (RED) complete. Created the following test artifacts — no production l
 
 `mvn test` failed with **8 compilation errors** — all `cannot find symbol: method restock(...)` — confirming tests are RED for the correct reason (missing production implementation). Awaiting approval to commit and proceed to Phase 2 (GREEN).
 
+## 2026-07-22T18:06:32+05:30
+
+****User Prompt:****
+Story 13: Restock Vehicle Inventory (Admin Only) — proceed with Phase 2 (GREEN) and commit current phase.
+
+****AI Response:****
+Committed Phase 1 (RED) as `test(inventory): add failing tests for vehicle restocking` and pushed to GitHub.
+
+Phase 2 (GREEN) implemented with minimum production code:
+
+1. Added `restock(Long id, int quantity)` to `VehicleService` interface.
+2. Implemented `restock()` in `VehicleServiceImpl` — validates quantity > 0 (IllegalArgumentException), looks up vehicle (VehicleNotFoundException), increments quantity via `setQuantity`, saves.
+3. Added `POST /{id}/restock` endpoint to `VehicleController` with `@PreAuthorize("hasRole('ADMIN')")` and `@Valid` on `RestockRequest`.
+4. Fixed the standalone MockMvc interceptor in `VehicleControllerTest` to return 401 for anonymous requests and 403 for wrong-role requests.
+
+All 103 tests pass (BUILD SUCCESS). Committed as `feat(inventory): implement admin vehicle restock` and pushed. Awaiting approval to proceed to Phase 3 (REFACTOR).
+
+## 2026-07-22T18:11:17+05:30
+
+****User Prompt:****
+Story 13: Restock Vehicle Inventory (Admin Only) — proceed with Phase 3 (REFACTOR).
+
+****AI Response:****
+Phase 3 (REFACTOR) complete. Two targeted changes, no behaviour altered:
+
+1. Added `addStock(int amount)` domain method to `Vehicle` entity — encapsulates quantity increment logic inside the entity.
+2. Updated `VehicleServiceImpl.restock()` to call `vehicle.addStock(quantity)` instead of `vehicle.setQuantity(vehicle.getQuantity() + quantity)`.
+
+All 103 tests pass (BUILD SUCCESS). Committed as `refactor(inventory): move stock logic to vehicle domain entity` and pushed. Story 13 is complete — all three TDD phases (RED → GREEN → REFACTOR) are done with individual commits.
+
