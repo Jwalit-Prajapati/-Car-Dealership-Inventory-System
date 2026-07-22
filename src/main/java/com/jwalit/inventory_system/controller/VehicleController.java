@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -27,5 +31,24 @@ public class VehicleController {
     public ResponseEntity<Vehicle> createVehicle(@Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
         Vehicle createdVehicle = vehicleService.create(vehicleRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdVehicle);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<Vehicle>> getVehicles(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            Pageable pageable) {
+        if ((page != null && page < 0) || (size != null && size <= 0)) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(vehicleService.getVehicles(pageable));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<Vehicle>> searchVehicles(
+            @RequestParam(required = false) String make,
+            @RequestParam(required = false) String category,
+            Pageable pageable) {
+        return ResponseEntity.ok(vehicleService.searchVehicles(make, category, pageable));
     }
 }
