@@ -98,4 +98,47 @@ class PurchaseIntegrationTest {
         Iterable<Purchase> purchases = purchaseRepository.findAll();
         assertThat(purchases).hasSize(1);
     }
+
+    @Test
+    void testPurchaseFlow_Concurrency() throws InterruptedException {
+        PurchaseRequestDTO requestDTO = new PurchaseRequestDTO(1);
+        
+        java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newFixedThreadPool(2);
+        java.util.concurrent.CountDownLatch startLatch = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch doneLatch = new java.util.concurrent.CountDownLatch(2);
+        java.util.concurrent.atomic.AtomicInteger errorCount = new java.util.concurrent.atomic.AtomicInteger(0);
+        java.util.concurrent.atomic.AtomicInteger successCount = new java.util.concurrent.atomic.AtomicInteger(0);
+
+        Runnable purchaseTask = () -> {
+            try {
+                startLatch.await();
+                purchaseService.purchaseVehicle(vehicleId, requestDTO, userDetails);
+                successCount.incrementAndGet();
+            } catch (org.springframework.dao.OptimisticLockingFailureException e) {
+                errorCount.incrementAndGet();
+            } catch (Exception e) {
+                // If it fails for another reason, we can log it
+                e.printStackTrace();
+            } finally {
+                doneLatch.countDown();
+            }
+        };
+
+        executor.submit(purchaseTask);
+        executor.submit(purchaseTask);
+
+        startLatch.countDown();
+        doneLatch.await();
+        executor.shutdown();
+
+        assertThat(successCount.get()).isEqualTo(1);
+        assertThat(errorCount.get()).isEqualTo(1);
+
+        Optional<Vehicle> updatedVehicle = vehicleRepository.findById(vehicleId);
+        assertThat(updatedVehicle).isPresent();
+        assertThat(updatedVehicle.get().getQuantity()).isEqualTo(9);
+
+        Iterable<Purchase> purchases = purchaseRepository.findAll();
+        assertThat(purchases).hasSize(1);
+    }
 }
