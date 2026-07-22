@@ -22,7 +22,7 @@ class HealthControllerTest {
 
     @Test
     void shouldReturnHealthStatusOk() throws Exception {
-        mockMvc.perform(get("/api/v1/health"))
+        mockMvc.perform(get("/api/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.status").value(200))

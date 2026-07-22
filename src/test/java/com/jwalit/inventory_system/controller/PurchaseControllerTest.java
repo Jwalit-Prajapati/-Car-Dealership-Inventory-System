@@ -51,7 +51,7 @@ class PurchaseControllerTest {
                 new UsernamePasswordAuthenticationToken(org.springframework.security.core.userdetails.User.builder()
                         .username("customer")
                         .password("password")
-                        .roles("CUSTOMER")
+                        .roles("USER")
                         .build(), "password",
                         Arrays.asList(new SimpleGrantedAuthority("ROLE_" + role)))
         );
@@ -71,7 +71,7 @@ class PurchaseControllerTest {
                         return org.springframework.security.core.userdetails.User.builder()
                                 .username("customer")
                                 .password("password")
-                                .roles("CUSTOMER")
+                                .roles("USER")
                                 .build();
                     }
                 })
@@ -81,7 +81,7 @@ class PurchaseControllerTest {
 
     @Test
     void purchaseVehicle_Success() throws Exception {
-        manuallySetUserRole("CUSTOMER");
+        manuallySetUserRole("USER");
 
         PurchaseResponseDTO mockResponse = new PurchaseResponseDTO(
                 100L, 1L, "Toyota Camry", 2,
@@ -103,7 +103,7 @@ class PurchaseControllerTest {
 
     @Test
     void purchaseVehicle_InvalidQuantity() throws Exception {
-        manuallySetUserRole("CUSTOMER");
+        manuallySetUserRole("USER");
         requestDTO.setQuantity(0);
 
         mockMvc.perform(post("/api/purchases")
@@ -125,7 +125,7 @@ class PurchaseControllerTest {
 
     @Test
     void purchaseVehicle_VehicleNotFound() throws Exception {
-        manuallySetUserRole("CUSTOMER");
+        manuallySetUserRole("USER");
         requestDTO.setVehicleId(99L);
         when(purchaseService.purchaseVehicle(any(PurchaseRequestDTO.class), any(UserDetails.class)))
                 .thenThrow(new VehicleNotFoundException("Vehicle not found"));

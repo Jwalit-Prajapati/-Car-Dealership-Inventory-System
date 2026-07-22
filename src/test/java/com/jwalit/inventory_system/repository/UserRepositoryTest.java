@@ -46,7 +46,7 @@ class UserRepositoryTest {
         user.setCountry("USA");
         user.setPostalCode("10001");
         user.setDrivingLicenseNumber("DL12345678");
-        user.setRole(Role.CUSTOMER);
+        user.setRole(Role.USER);
 
         User savedUser = userRepository.save(user);
 
@@ -55,7 +55,7 @@ class UserRepositoryTest {
         assertThat(retrievedUser).isPresent();
         assertThat(retrievedUser.get().getFirstName()).isEqualTo("John");
         assertThat(retrievedUser.get().getEmail()).isEqualTo("john.doe@example.com");
-        assertThat(retrievedUser.get().getRole()).isEqualTo(Role.CUSTOMER);
+        assertThat(retrievedUser.get().getRole()).isEqualTo(Role.USER);
     }
 
     @Test
@@ -71,7 +71,7 @@ class UserRepositoryTest {
         user1.setLastName("Smith");
         user1.setEmail("alice.smith@example.com");
         user1.setPassword("pass1");
-        user1.setRole(Role.CUSTOMER);
+        user1.setRole(Role.USER);
         userRepository.saveAndFlush(user1);
 
         User user2 = new User();
@@ -79,7 +79,7 @@ class UserRepositoryTest {
         user2.setLastName("Smith");
         user2.setEmail("alice.smith@example.com"); // Duplicate email
         user2.setPassword("pass2");
-        user2.setRole(Role.CUSTOMER);
+        user2.setRole(Role.USER);
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(user2))
                 .isInstanceOf(DataIntegrityViolationException.class);

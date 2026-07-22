@@ -49,7 +49,7 @@ class PurchaseRepositoryTest {
         user.setLastName("One");
         user.setEmail("buyer@example.com");
         user.setPassword("password");
-        user.setRole(Role.CUSTOMER);
+        user.setRole(Role.USER);
         user.setCreatedAt(LocalDateTime.now());
         savedUser = userRepository.save(user);
 

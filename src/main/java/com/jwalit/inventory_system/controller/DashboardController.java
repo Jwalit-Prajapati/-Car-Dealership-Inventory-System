@@ -1,24 +1,25 @@
 package com.jwalit.inventory_system.controller;
 
 import com.jwalit.inventory_system.dto.InventoryStatsDto;
+import com.jwalit.inventory_system.dto.SalesStatisticsResponse;
 import com.jwalit.inventory_system.service.InventoryStatsService;
+import com.jwalit.inventory_system.service.SalesStatisticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/admin/stats")
+@RequiredArgsConstructor
 public class DashboardController {
 
     private final InventoryStatsService inventoryStatsService;
-    private final com.jwalit.inventory_system.service.SalesStatisticsService salesStatisticsService;
+    private final SalesStatisticsService salesStatisticsService;
 
-    public DashboardController(InventoryStatsService inventoryStatsService, com.jwalit.inventory_system.service.SalesStatisticsService salesStatisticsService) {
-        this.inventoryStatsService = inventoryStatsService;
-        this.salesStatisticsService = salesStatisticsService;
-    }
 
     @GetMapping("/inventory")
     @PreAuthorize("hasRole('ADMIN')")
@@ -28,7 +29,7 @@ public class DashboardController {
 
     @GetMapping("/sales")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<com.jwalit.inventory_system.dto.SalesStatisticsResponse> getSalesStats() {
+    public ResponseEntity<SalesStatisticsResponse> getSalesStats() {
         return ResponseEntity.ok(salesStatisticsService.getSalesStatistics());
     }
 }

@@ -53,7 +53,7 @@ class PurchaseIntegrationTest {
     private UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
             .username("integration@test.com")
             .password("password")
-            .roles("CUSTOMER")
+            .roles("USER")
             .build();
 
     @BeforeEach
