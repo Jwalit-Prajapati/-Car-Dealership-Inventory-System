@@ -1159,3 +1159,19 @@ Phase 2 (GREEN): Implemented the required repository queries, created the SalesS
 Phase 3 (REFACTOR): Refactored the most purchased vehicle query to use Pageable, ensuring that we only load the top record into memory rather than fetching all aggregated groups. All 124 tests still pass.
 
 Story 15 is complete.
+
+---
+
+**Timestamp:** 2026-07-22T19:20:00+05:30
+
+**User Prompt:**
+Implement the missing search functionality for `GET /api/vehicles/search` supporting `model`, `minimumPrice`, and `maximumPrice`. Follow the RED -> GREEN -> REFACTOR cycle exactly. Do not write production code before writing the corresponding failing tests.
+
+**AI Response:**
+
+Phase 1 (RED): Added 9 specification tests in `VehicleRepositoryTest`, validation and parameter handling tests in `VehicleServiceTest`, and API integration tests in `VehicleControllerTest`. Validated they fail as expected.
+Phase 2 (GREEN): Implemented the dynamic specification builders in `VehicleSpecifications`, added parameters and validation in `VehicleController` and `VehicleServiceImpl`. All 142 tests passed.
+Phase 3 (REFACTOR): Simplified `VehicleServiceImpl` by removing redundant null checks (which are already cleanly handled by `VehicleSpecifications`). All 142 tests still pass.
+
+Story is complete.
+
