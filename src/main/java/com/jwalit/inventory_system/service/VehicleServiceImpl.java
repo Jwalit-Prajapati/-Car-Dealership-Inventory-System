@@ -16,6 +16,17 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public Vehicle create(VehicleRequestDTO vehicleRequestDTO) {
-        return null;
+        if (vehicleRequestDTO == null) {
+            throw new IllegalArgumentException("VehicleRequestDTO cannot be null");
+        }
+        
+        Vehicle vehicle = new Vehicle();
+        vehicle.setMake(vehicleRequestDTO.getMake());
+        vehicle.setModel(vehicleRequestDTO.getModel());
+        vehicle.setCategory(vehicleRequestDTO.getCategory());
+        vehicle.setPrice(vehicleRequestDTO.getPrice());
+        vehicle.setQuantity(vehicleRequestDTO.getQuantity());
+
+        return vehicleRepository.save(vehicle);
     }
 }

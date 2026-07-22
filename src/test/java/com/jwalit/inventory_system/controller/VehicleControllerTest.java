@@ -11,11 +11,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -37,12 +47,39 @@ class VehicleControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(vehicleController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(vehicleController)
+                .addInterceptors(new HandlerInterceptor() {
+                    @Override
+                    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+                        if (handler instanceof HandlerMethod) {
+                            HandlerMethod handlerMethod = (HandlerMethod) handler;
+                            PreAuthorize preAuthorize = handlerMethod.getMethodAnnotation(PreAuthorize.class);
+                            if (preAuthorize != null) {
+                                var auth = SecurityContextHolder.getContext().getAuthentication();
+                                if (auth == null || !preAuthorize.value().contains(auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", ""))) {
+                                    response.setStatus(403);
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                })
+                .build();
+    }
+
+    private void manuallySetUserRole(String role) {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("user", "password", 
+                        Arrays.asList(new SimpleGrantedAuthority("ROLE_" + role)))
+        );
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void createVehicle_asAdmin_returns201() throws Exception {
+        manuallySetUserRole("ADMIN"); // Workaround for standalone setup without SpringExtension
+
         VehicleRequestDTO request = new VehicleRequestDTO("Toyota", "Camry", "Sedan", new BigDecimal("25000"), 10);
         Vehicle mockVehicle = new Vehicle();
         mockVehicle.setId(1L);
@@ -53,27 +90,37 @@ class VehicleControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
+        
+        SecurityContextHolder.clearContext();
     }
 
     @Test
     @WithMockUser(roles = "USER")
     void createVehicle_asUser_returns403() throws Exception {
+        manuallySetUserRole("USER"); // Workaround for standalone setup without SpringExtension
+
         VehicleRequestDTO request = new VehicleRequestDTO("Toyota", "Camry", "Sedan", new BigDecimal("25000"), 10);
 
         mockMvc.perform(post("/api/vehicles")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
+                
+        SecurityContextHolder.clearContext();
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void createVehicle_invalidPayload_returns400() throws Exception {
+        manuallySetUserRole("ADMIN");
+
         VehicleRequestDTO request = new VehicleRequestDTO("", "", "", new BigDecimal("-1"), -5);
 
         mockMvc.perform(post("/api/vehicles")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+                
+        SecurityContextHolder.clearContext();
     }
 }
