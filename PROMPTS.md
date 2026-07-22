@@ -613,6 +613,7 @@ Verify Bean Validation:
 
 - invalid email
 
+
 - password length
 
 ---
@@ -928,10 +929,45 @@ Successfully completed Phase 1 (RED) by writing failing tests for the Controller
 Successfully completed Phase 2 (GREEN) by implementing the logic to satisfy the failing tests. I updated VehicleServiceImpl to support updating and deleting vehicles and created a specific VehicleNotFoundException that extends ResourceNotFoundException.
 Successfully completed Phase 3 (REFACTOR) by optimizing the mapping in VehicleServiceImpl using MapStruct and verifying the behavior in the updated tests.
 
-### Timestamp: 2026-07-22T16:53:00+05:30
-**User Prompt:**
-Implement Story 11: Purchase Entity and Repository using strict Test-Driven Development (TDD) while following all rules defined in AGENTS.md, including the testing policy, commit policy, and AI usage disclosure.
+## Interaction
+**Timestamp:** 2026-07-22T16:53:00+05:30
 
-**AI Response:**
-Followed strict TDD workflow (RED -> GREEN -> REFACTOR) to implement the Purchase entity, Flyway migrations, and Repository. Tests fail initially, then pass, then refactored to use Lombok and lazy fetching. All code committed with appropriate AI usage disclosures.
+****User Prompt:****
+[Provided instructions for Story 11: Purchase Entity and Repository (Strict TDD)]
+
+****AI Response:****
+1. **What is being implemented:** The RED phase tests for `PurchaseRepository`, ensuring the correct fields and relationships exist.
+2. **Source code:** Created `PurchaseRepositoryTest.java` and stub implementations of the entity and repository.
+3. **Why it satisfies the tests:** The test currently fails because the entity fields return null and the mappings are missing. This is expected in TDD: we define the desired behavior in a failing test before writing any production code.
+4. **Commit:** Committed with `test(purchase): add failing purchase repository tests` and pushed to GitHub.
+
+I am stopping after the RED phase and waiting for your approval to proceed to the GREEN phase.
+
+## Interaction
+**Timestamp:** 2026-07-22T16:57:22+05:30
+
+****User Prompt:****
+proceed with phase 2(GREEN)
+
+****AI Response:****
+1. **What is being implemented:** The GREEN phase for `Purchase` entity, containing the production code needed to satisfy the repository tests.
+2. **Source code:** Implemented `@Entity` mapping in `Purchase.java` and created Flyway migration `V6__create_purchases_table.sql`.
+3. **Why it satisfies the tests:** By properly defining `@ManyToOne` relationships and the database schema, the repository can now successfully persist and fetch a purchase.
+4. **Commit:** Committed with `feat(purchase): implement purchase entity and repository` and pushed to GitHub.
+
+I am stopping after the GREEN phase and waiting for your approval to proceed to the REFACTOR phase.
+
+## Interaction
+**Timestamp:** 2026-07-22T16:59:16+05:30
+
+****User Prompt:****
+proceed with phase 3
+
+****AI Response:****
+1. **What is being implemented:** The REFACTOR phase for `Purchase` entity.
+2. **Source code:** Updated `Purchase.java` to replace manual getters/setters with Lombok and configured `FetchType.LAZY` on relationships.
+3. **Why it satisfies the tests:** The public API remains identical, so the tests continue to pass while the code is cleaner and optimized.
+4. **Commit:** Committed with `refactor(purchase): optimize entity mappings with lazy fetching` and pushed to GitHub.
+
+This completes Story 11!
 
