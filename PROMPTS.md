@@ -128,3 +128,49 @@ I am stopping after the GREEN phase and waiting for your approval to proceed to 
 
 **AI Response:**
 I have completely rewritten both \ApiResponseTest.java\ and \ApiResponse.java\ from scratch without relying on any external boilerplates. I designed a novel factory-based assignment strategy to pass the tests while ensuring originality. The tests ran successfully, and I've committed and pushed this new GREEN phase implementation to GitHub. Are you ready for me to proceed to the REFACTOR phase?
+
+## 2026-07-22T10:59:05+05:30
+
+**User Prompt:**
+proceed to the refactor phase
+
+**AI Response:**
+1. **What is being implemented:** The REFACTOR phase for \ApiResponse\. The original factory-based boilerplate was stripped down by utilizing Lombok annotations (\@Getter\, \@Builder\, \@NoArgsConstructor\, \@AllArgsConstructor\). The factory methods now utilize the Lombok builder to instantiate and return responses cleanly.
+2. **Source code:** Updated \ApiResponse.java\ to use Lombok annotations.
+3. **Why it satisfies the tests:** The public API and object properties remained identical. Using \@Builder.Default\ for \Instant.now()\ ensures that tests asserting timestamp instantiation automatically pass, demonstrating identical behavior with significantly less boilerplate.
+4. **Commit:** Committed with \efactor(api): simplify api response using lombok\ and pushed to GitHub.
+
+This completes Story 2! Let me know when you're ready for the next story.
+
+## 2026-07-22T11:03:58+05:30
+
+**User Prompt:**
+Create the following custom exceptions: ResourceNotFoundException, ValidationException... using Strict TDD Workflow.
+
+**AI Response:**
+Created the failing tests and committed them. Stopping after the RED phase to explain the failure and wait for approval.
+
+## 2026-07-22T11:05:32+05:30
+
+**User Prompt:**
+proceed with next phase
+
+**AI Response:**
+Implemented ResourceNotFoundException and ValidationException to satisfy the tests. Verified all tests passed using 'mvn test' and committed the changes. Stopping after GREEN phase and waiting for approval to proceed to the REFACTOR phase.
+
+## 2026-07-22T11:07:23+05:30
+
+**User Prompt:**
+proceed with next phase
+
+**AI Response:**
+Reviewed the implementation during the REFACTOR phase. Decided not to introduce \BaseAppException\ because it would be a premature abstraction violating YAGNI. There is currently no duplicated logic beyond the basic constructor, and adding a base class would not meaningfully improve readability or maintainability at this stage. No code changes or commits were made.
+
+## 2026-07-22T11:22:25+05:30
+
+**User Prompt:**
+proceed with next phase
+commit this red phase
+
+**AI Response:**
+Created GlobalExceptionHandlerTest.java with failing mockmvc tests for global exception handling. The tests fail because the GlobalExceptionHandler class does not exist yet. Added the AI usage disclosure and committed the RED phase.
