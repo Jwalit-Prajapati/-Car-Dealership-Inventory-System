@@ -93,4 +93,78 @@ class PurchaseRepositoryTest {
         assertThat(retrievedPurchase.getVehicle().getId()).isEqualTo(savedVehicle.getId());
         assertThat(retrievedPurchase.getVehicle().getMake()).isEqualTo("Toyota");
     }
+
+    private void createPurchase(Vehicle vehicle, BigDecimal price, int quantity) {
+        Purchase purchase = new Purchase();
+        purchase.setUser(savedUser);
+        purchase.setVehicle(vehicle);
+        purchase.setPurchasedPrice(price);
+        purchase.setQuantityPurchased(quantity);
+        purchase.setPurchaseDate(LocalDateTime.now());
+        purchaseRepository.save(purchase);
+    }
+
+    @Test
+    void getTotalRevenue_calculatesCorrectly_withMultiplePurchases() {
+        createPurchase(savedVehicle, new BigDecimal("100.00"), 2); // 200
+        createPurchase(savedVehicle, new BigDecimal("50.00"), 3);  // 150
+        
+        BigDecimal revenue = purchaseRepository.getTotalRevenue();
+        assertThat(revenue).isEqualByComparingTo("350.00");
+    }
+
+    @Test
+    void getTotalSalesCount_calculatesCorrectly() {
+        createPurchase(savedVehicle, new BigDecimal("100.00"), 2);
+        createPurchase(savedVehicle, new BigDecimal("50.00"), 3);
+        
+        Long count = purchaseRepository.getTotalSalesCount();
+        assertThat(count).isEqualTo(2L);
+    }
+
+    @Test
+    void findMostPurchasedVehicleData_findsMostPurchasedVehicle_handlesMultiplePurchasesAcrossVehicles() {
+        Vehicle vehicle2 = new Vehicle();
+        vehicle2.setMake("Honda");
+        vehicle2.setModel("Civic");
+        vehicle2.setCategory("Sedan");
+        vehicle2.setPrice(new BigDecimal("22000.00"));
+        vehicle2.setQuantity(5);
+        vehicle2 = vehicleRepository.save(vehicle2);
+
+        // savedVehicle bought 1 time
+        createPurchase(savedVehicle, new BigDecimal("25000.00"), 1);
+
+        // vehicle2 bought 3 times
+        createPurchase(vehicle2, new BigDecimal("22000.00"), 1);
+        createPurchase(vehicle2, new BigDecimal("22000.00"), 1);
+        createPurchase(vehicle2, new BigDecimal("22000.00"), 2);
+
+        java.util.List<Object[]> results = purchaseRepository.findMostPurchasedVehicleData();
+        assertThat(results).isNotEmpty();
+        Object[] firstResult = results.get(0);
+        Vehicle topVehicle = (Vehicle) firstResult[0];
+        Long purchaseCount = (Long) firstResult[1];
+        
+        assertThat(topVehicle.getId()).isEqualTo(vehicle2.getId());
+        assertThat(purchaseCount).isEqualTo(3L);
+    }
+
+    @Test
+    void getTotalRevenue_returnsZero_whenNoPurchasesExist() {
+        BigDecimal revenue = purchaseRepository.getTotalRevenue();
+        assertThat(revenue).isNull();
+    }
+
+    @Test
+    void getTotalSalesCount_returnsZero_whenNoPurchasesExist() {
+        Long count = purchaseRepository.getTotalSalesCount();
+        assertThat(count).isEqualTo(0L);
+    }
+
+    @Test
+    void findMostPurchasedVehicleData_returnsEmpty_whenNoPurchasesExist() {
+        java.util.List<Object[]> results = purchaseRepository.findMostPurchasedVehicleData();
+        assertThat(results).isEmpty();
+    }
 }
