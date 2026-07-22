@@ -52,21 +52,21 @@ public class VehicleController {
             @RequestParam(required = false) String make,
             @RequestParam(required = false) String model,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) java.math.BigDecimal minimumPrice,
-            @RequestParam(required = false) java.math.BigDecimal maximumPrice,
+            @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @RequestParam(required = false) java.math.BigDecimal maxPrice,
             Pageable pageable) {
             
-        if (minimumPrice != null && minimumPrice.compareTo(java.math.BigDecimal.ZERO) < 0) {
+        if (minPrice != null && minPrice.compareTo(java.math.BigDecimal.ZERO) < 0) {
             return ResponseEntity.badRequest().build();
         }
-        if (maximumPrice != null && maximumPrice.compareTo(java.math.BigDecimal.ZERO) < 0) {
+        if (maxPrice != null && maxPrice.compareTo(java.math.BigDecimal.ZERO) < 0) {
             return ResponseEntity.badRequest().build();
         }
-        if (minimumPrice != null && maximumPrice != null && minimumPrice.compareTo(maximumPrice) > 0) {
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
             return ResponseEntity.badRequest().build();
         }
         
-        return ResponseEntity.ok(vehicleService.searchVehicles(make, model, category, minimumPrice, maximumPrice, pageable));
+        return ResponseEntity.ok(vehicleService.searchVehicles(make, model, category, minPrice, maxPrice, pageable));
     }
 
     @org.springframework.web.bind.annotation.PutMapping("/{id}")

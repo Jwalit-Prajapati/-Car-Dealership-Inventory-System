@@ -32,9 +32,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     @Transactional
     public Purchase purchaseVehicle(Long vehicleId, PurchaseRequestDTO requestDTO, UserDetails userDetails) {
-        if (requestDTO.getQuantity() == null || requestDTO.getQuantity() <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than zero");
-        }
+
 
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found"));

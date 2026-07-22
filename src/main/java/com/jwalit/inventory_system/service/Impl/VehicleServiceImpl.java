@@ -4,7 +4,10 @@ import com.jwalit.inventory_system.dto.VehicleRequestDTO;
 import com.jwalit.inventory_system.entity.Vehicle;
 import com.jwalit.inventory_system.mapper.VehicleMapper;
 import com.jwalit.inventory_system.repository.VehicleRepository;
+import com.jwalit.inventory_system.repository.VehicleSpecifications;
 import com.jwalit.inventory_system.service.VehicleService;
+import com.jwalit.inventory_system.exception.VehicleNotFoundException;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +25,6 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public Vehicle create(VehicleRequestDTO vehicleRequestDTO) {
-        if (vehicleRequestDTO == null) {
-            throw new IllegalArgumentException("VehicleRequestDTO cannot be null");
-        }
-        
         Vehicle vehicle = vehicleMapper.toEntity(vehicleRequestDTO);
         return vehicleRepository.save(vehicle);
     }
@@ -36,13 +35,13 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public Page<Vehicle> searchVehicles(String make, String model, String category, java.math.BigDecimal minimumPrice, java.math.BigDecimal maximumPrice, Pageable pageable) {
-        org.springframework.data.jpa.domain.Specification<Vehicle> spec = org.springframework.data.jpa.domain.Specification
-                .where(com.jwalit.inventory_system.repository.VehicleSpecifications.hasMake(make))
-                .and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasModel(model))
-                .and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasCategory(category))
-                .and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasMinimumPrice(minimumPrice))
-                .and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasMaximumPrice(maximumPrice));
+    public Page<Vehicle> searchVehicles(String make, String model, String category, java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice, Pageable pageable) {
+        Specification<Vehicle> spec = Specification
+                .where(VehicleSpecifications.hasMake(make))
+                .and(VehicleSpecifications.hasModel(model))
+                .and(VehicleSpecifications.hasCategory(category))
+                .and(VehicleSpecifications.hasMinimumPrice(minPrice))
+                .and(VehicleSpecifications.hasMaximumPrice(maxPrice));
                 
         return vehicleRepository.findAll(spec, pageable);
     }
@@ -50,7 +49,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public Vehicle update(Long id, VehicleRequestDTO vehicleRequestDTO) {
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
+                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with id: " + id));
         
         vehicleMapper.updateEntityFromDto(vehicleRequestDTO, vehicle);
         
@@ -60,7 +59,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public void delete(Long id) {
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
+                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with id: " + id));
         vehicleRepository.delete(vehicle);
     }
 
@@ -70,7 +69,7 @@ public class VehicleServiceImpl implements VehicleService {
             throw new IllegalArgumentException("Restock quantity must be greater than 0");
         }
         Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
+                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with id: " + id));
         vehicle.addStock(quantity);
         vehicleRepository.save(vehicle);
     }

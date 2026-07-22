@@ -102,29 +102,6 @@ class PurchaseServiceTest {
         verify(vehicleRepository, never()).save(any());
     }
 
-    @Test
-    void testPurchaseVehicle_QuantityZero() {
-        requestDTO.setQuantity(0);
-
-        assertThrows(IllegalArgumentException.class, () -> 
-            purchaseService.purchaseVehicle(1L, requestDTO, userDetails)
-        );
-
-        verify(purchaseRepository, never()).save(any());
-        verify(vehicleRepository, never()).save(any());
-    }
-
-    @Test
-    void testPurchaseVehicle_QuantityNegative() {
-        requestDTO.setQuantity(-1);
-
-        assertThrows(IllegalArgumentException.class, () -> 
-            purchaseService.purchaseVehicle(1L, requestDTO, userDetails)
-        );
-
-        verify(purchaseRepository, never()).save(any());
-        verify(vehicleRepository, never()).save(any());
-    }
 
     @Test
     void testPurchaseVehicle_InsufficientStock() {

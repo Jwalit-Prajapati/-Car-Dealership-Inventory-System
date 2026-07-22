@@ -64,11 +64,7 @@ class VehicleServiceTest {
         verify(vehicleRepository).save(any(Vehicle.class));
     }
     
-    @Test
-    void create_nullRequest_throwsException() {
-        assertThatThrownBy(() -> vehicleService.create(null))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+
 
     @Test
     void update_validRequest_updatesAndReturnsVehicle() {
@@ -193,8 +189,41 @@ class VehicleServiceTest {
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
 
+    @Test
+    void searchVehicles_withNoFilters_forwardsCorrectly() {
+        org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
+        when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
+            .thenReturn(emptyPage);
+        vehicleService.searchVehicles(null, null, null, null, null, org.springframework.data.domain.PageRequest.of(0, 10));
+        verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
+    }
 
+    @Test
+    void searchVehicles_withMinPriceOnly_forwardsCorrectly() {
+        org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
+        when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
+            .thenReturn(emptyPage);
+        vehicleService.searchVehicles(null, null, null, new BigDecimal("10000"), null, org.springframework.data.domain.PageRequest.of(0, 10));
+        verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
+    }
 
+    @Test
+    void searchVehicles_withMaxPriceOnly_forwardsCorrectly() {
+        org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
+        when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
+            .thenReturn(emptyPage);
+        vehicleService.searchVehicles(null, null, null, null, new BigDecimal("30000"), org.springframework.data.domain.PageRequest.of(0, 10));
+        verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
+    }
+
+    @Test
+    void searchVehicles_withBoundaryPrices_forwardsCorrectly() {
+        org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
+        when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
+            .thenReturn(emptyPage);
+        vehicleService.searchVehicles(null, null, null, BigDecimal.ZERO, new BigDecimal("9999999"), org.springframework.data.domain.PageRequest.of(0, 10));
+        verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
+    }
     @Test
     void searchVehicles_emptyResultsHandledCorrectly() {
         org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();

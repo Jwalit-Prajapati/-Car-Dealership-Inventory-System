@@ -189,7 +189,7 @@ class VehicleControllerTest {
     @Test
     void searchVehicles_byMinimumPrice_returns200() throws Exception {
         mockMvc.perform(get("/api/vehicles/search")
-                .param("minimumPrice", "15000")
+                .param("minPrice", "15000")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -197,7 +197,7 @@ class VehicleControllerTest {
     @Test
     void searchVehicles_byMaximumPrice_returns200() throws Exception {
         mockMvc.perform(get("/api/vehicles/search")
-                .param("maximumPrice", "25000")
+                .param("maxPrice", "25000")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -208,8 +208,8 @@ class VehicleControllerTest {
                 .param("make", "Toyota")
                 .param("model", "Camry")
                 .param("category", "Sedan")
-                .param("minimumPrice", "15000")
-                .param("maximumPrice", "35000")
+                .param("minPrice", "15000")
+                .param("maxPrice", "35000")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -217,7 +217,7 @@ class VehicleControllerTest {
     @Test
     void searchVehicles_invalidMinPrice_returns400() throws Exception {
         mockMvc.perform(get("/api/vehicles/search")
-                .param("minimumPrice", "-500")
+                .param("minPrice", "-500")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -225,7 +225,7 @@ class VehicleControllerTest {
     @Test
     void searchVehicles_invalidMaxPrice_returns400() throws Exception {
         mockMvc.perform(get("/api/vehicles/search")
-                .param("maximumPrice", "-500")
+                .param("maxPrice", "-500")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -233,8 +233,8 @@ class VehicleControllerTest {
     @Test
     void searchVehicles_minGreaterThanMaxPrice_returns400() throws Exception {
         mockMvc.perform(get("/api/vehicles/search")
-                .param("minimumPrice", "30000")
-                .param("maximumPrice", "20000")
+                .param("minPrice", "30000")
+                .param("maxPrice", "20000")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

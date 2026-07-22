@@ -37,7 +37,9 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(authController)
+                .setControllerAdvice(new com.jwalit.inventory_system.exception.GlobalExceptionHandler())
+                .build();
     }
 
     @Test

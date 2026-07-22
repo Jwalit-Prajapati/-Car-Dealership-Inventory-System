@@ -14,6 +14,6 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     @org.springframework.data.jpa.repository.Query("SELECT COUNT(p) FROM Purchase p")
     Long getTotalSalesCount();
 
-    @org.springframework.data.jpa.repository.Query("SELECT p.vehicle, COUNT(p) as purchaseCount FROM Purchase p GROUP BY p.vehicle ORDER BY purchaseCount DESC")
-    java.util.List<Object[]> findMostPurchasedVehicleData(org.springframework.data.domain.Pageable pageable);
+    @org.springframework.data.jpa.repository.Query("SELECT p.vehicle AS vehicle, COUNT(p) AS purchaseCount FROM Purchase p GROUP BY p.vehicle ORDER BY purchaseCount DESC")
+    java.util.List<VehiclePurchaseCountProjection> findMostPurchasedVehicleData(org.springframework.data.domain.Pageable pageable);
 }

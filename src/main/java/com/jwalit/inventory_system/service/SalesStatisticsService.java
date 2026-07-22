@@ -26,10 +26,9 @@ public class SalesStatisticsService {
         Long count = purchaseRepository.getTotalSalesCount();
         response.setTotalSalesCount(count != null ? count : 0L);
 
-        List<Object[]> topVehicleData = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
+        java.util.List<com.jwalit.inventory_system.repository.VehiclePurchaseCountProjection> topVehicleData = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
         if (topVehicleData != null && !topVehicleData.isEmpty()) {
-            Object[] row = topVehicleData.get(0);
-            Vehicle topVehicle = (Vehicle) row[0];
+            Vehicle topVehicle = topVehicleData.get(0).getVehicle();
             response.setMostPurchasedVehicle(topVehicle);
         } else {
             response.setMostPurchasedVehicle(null);
