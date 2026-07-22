@@ -1,6 +1,7 @@
-package com.jwalit.inventory_system.config;
+package com.jwalit.inventory_system.security;
 
 import com.jwalit.inventory_system.repository.UserRepository;
+import com.jwalit.inventory_system.security.CustomUserDetails;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
+                .map(CustomUserDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 

@@ -1175,3 +1175,56 @@ Phase 3 (REFACTOR): Simplified `VehicleServiceImpl` by removing redundant null c
 
 Story is complete.
 
+---
+
+**Timestamp:** 2026-07-22T19:23:22+05:30
+
+**User Prompt:**
+Perform a strict TDD-based refactoring to resolve the following design issues.
+Task 1: Remove Redundant Registration Date
+Task 2: Review UserDetails Boolean Methods
+
+**AI Response:**
+I've completed the strict TDD-based refactoring for both tasks successfully. The build passes with zero errors and zero failing tests (142 tests passed).
+Removed `registrationDate` and added TODO comments indicating that account management fields intentionally return true.
+
+---
+
+**Timestamp:** 2026-07-22T19:27:32+05:30
+
+**User Prompt:**
+why do you have implemented UserDetail on User entity
+
+**AI Response:**
+The `User` entity implements the `UserDetails` interface as a common Spring Security design pattern to streamline authentication and authorization...
+
+---
+
+**Timestamp:** 2026-07-22T19:28:46+05:30
+
+**User Prompt:**
+remove it and make customUserDetail which implements UserDetail class
+
+**AI Response:**
+I have successfully completed the changes to decouple `UserDetails` from your `User` entity. The entire test suite has passed (142 tests). Created `CustomUserDetails` and updated `SecurityConfig` and `User`.
+
+---
+
+**Timestamp:** 2026-07-22T19:31:51+05:30
+
+**User Prompt:**
+move all the security related files to the security package
+
+**AI Response:**
+I've successfully moved all the security-related files (`SecurityConfig`, `JwtAuthenticationFilter`, `JwtService`, `JwtServiceTest`) and their tests into the `security` package.
+
+---
+
+**Timestamp:** 2026-07-22T19:36:42+05:30
+
+**User Prompt:**
+shouldn't AuthService be located in service packege
+
+**AI Response:**
+Yes, absolutely! And that is exactly where it is. I intentionally kept `AuthService` and `AuthServiceTest` in the `service` package because it handles business logic.
+

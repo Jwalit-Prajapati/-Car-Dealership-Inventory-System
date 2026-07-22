@@ -1,4 +1,4 @@
-package com.jwalit.inventory_system.service;
+package com.jwalit.inventory_system.security;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

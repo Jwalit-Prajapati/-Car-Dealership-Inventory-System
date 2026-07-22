@@ -5,6 +5,7 @@ import com.jwalit.inventory_system.entity.Role;
 import com.jwalit.inventory_system.entity.User;
 import com.jwalit.inventory_system.repository.UserRepository;
 import com.jwalit.inventory_system.mapper.UserMapper;
+import com.jwalit.inventory_system.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -46,7 +46,6 @@ class UserRepositoryTest {
         user.setCountry("USA");
         user.setPostalCode("10001");
         user.setDrivingLicenseNumber("DL12345678");
-        user.setRegistrationDate(LocalDate.now());
         user.setRole(Role.CUSTOMER);
 
         User savedUser = userRepository.save(user);

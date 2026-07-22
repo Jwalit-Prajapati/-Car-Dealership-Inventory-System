@@ -5,6 +5,7 @@ import com.jwalit.inventory_system.dto.LoginResponse;
 import com.jwalit.inventory_system.dto.RegistrationRequest;
 import com.jwalit.inventory_system.entity.Role;
 import com.jwalit.inventory_system.entity.User;
+import com.jwalit.inventory_system.security.JwtService;
 import com.jwalit.inventory_system.repository.UserRepository;
 import com.jwalit.inventory_system.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;

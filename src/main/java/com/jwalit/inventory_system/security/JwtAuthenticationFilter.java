@@ -1,6 +1,5 @@
-package com.jwalit.inventory_system.config;
+package com.jwalit.inventory_system.security;
 
-import com.jwalit.inventory_system.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package com.jwalit.inventory_system.service;
+package com.jwalit.inventory_system.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
