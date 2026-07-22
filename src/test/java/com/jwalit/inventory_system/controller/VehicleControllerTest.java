@@ -52,12 +52,18 @@ class VehicleControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(vehicleController)
                 .addInterceptors(new HandlerInterceptor() {
                     @Override
-                    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+                    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
                         if (handler instanceof HandlerMethod handlerMethod) {
                             PreAuthorize preAuthorize = handlerMethod.getMethodAnnotation(PreAuthorize.class);
                             if (preAuthorize != null) {
                                 var auth = SecurityContextHolder.getContext().getAuthentication();
-                                if (auth == null || !preAuthorize.value().contains(auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", ""))) {
+                                if (auth == null) {
+                                    response.setStatus(401);
+                                    return false;
+                                }
+                                String role = auth.getAuthorities().iterator().next()
+                                        .getAuthority().replace("ROLE_", "");
+                                if (!preAuthorize.value().contains(role)) {
                                     response.setStatus(403);
                                     return false;
                                 }

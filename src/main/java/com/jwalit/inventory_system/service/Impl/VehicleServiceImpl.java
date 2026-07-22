@@ -63,4 +63,15 @@ public class VehicleServiceImpl implements VehicleService {
                 .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
         vehicleRepository.delete(vehicle);
     }
+
+    @Override
+    public void restock(Long id, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Restock quantity must be greater than 0");
+        }
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
+        vehicle.setQuantity(vehicle.getQuantity() + quantity);
+        vehicleRepository.save(vehicle);
+    }
 }

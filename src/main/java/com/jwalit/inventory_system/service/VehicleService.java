@@ -12,4 +12,6 @@ public interface VehicleService {
     Page<Vehicle> searchVehicles(String make, String category, Pageable pageable);
     Vehicle update(Long id, VehicleRequestDTO vehicleRequestDTO);
     void delete(Long id);
+    void restock(Long id, int quantity);
 }
+
