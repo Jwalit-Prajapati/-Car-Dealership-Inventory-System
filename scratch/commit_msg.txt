@@ -1,0 +1,3 @@
+refactor(config): explicitly declare PostgreSQL driver in application.yml
+
+Used an AI assistant to add the driver-class-name property to the database configuration to improve readability and robustness.
