@@ -9,21 +9,23 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+
 @RestController
 @RequestMapping("/api/purchases")
+@RequiredArgsConstructor
 public class PurchaseController {
 
     private final PurchaseService purchaseService;
 
-    public PurchaseController(PurchaseService purchaseService) {
-        this.purchaseService = purchaseService;
-    }
+
 
     @PostMapping
     public ResponseEntity<PurchaseResponseDTO> purchaseVehicle(
             @Valid @RequestBody PurchaseRequestDTO requestDTO,
             @AuthenticationPrincipal UserDetails userDetails) {
-        PurchaseResponseDTO response = purchaseService.purchaseVehicle(requestDTO, userDetails);
-        return ResponseEntity.ok(response);
+        PurchaseResponseDTO response = purchaseService.purchaseVehicle(requestDTO, userDetails.getUsername());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

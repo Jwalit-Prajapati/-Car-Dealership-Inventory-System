@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@lombok.EqualsAndHashCode(of = "id")
 public class Purchase {
     
     @Id

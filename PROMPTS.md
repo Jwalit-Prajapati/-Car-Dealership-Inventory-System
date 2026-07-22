@@ -1336,3 +1336,13 @@ Performed a full DTO response refactoring across the project:
 - `PurchaseResponseDTO` exposes only `customerName` (first + last name concatenated by mapper) — never the full `User` object
 
 All unit tests pass (114 tests, 0 failures, 0 new tests added). The 4 Testcontainers-based tests (`PurchaseIntegrationTest`, `PurchaseRepositoryTest`, `UserRepositoryTest`, `VehicleRepositoryTest`) fail due to Docker not being available on this machine — these failures are pre-existing and unrelated to this refactoring.
+
+## 2026-07-23T00:05:00Z
+
+****User Prompt:****
+refactor the following issues
+## 1. Controller Layer
+...
+
+****AI Response:****
+I have successfully resolved the remaining architectural issues across the service, repository, DTO, and mapper layers, and ensured that the project compiles correctly.

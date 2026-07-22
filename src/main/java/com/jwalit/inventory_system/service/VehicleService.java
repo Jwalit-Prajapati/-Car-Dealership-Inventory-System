@@ -6,23 +6,23 @@ import com.jwalit.inventory_system.entity.Vehicle;
 import com.jwalit.inventory_system.mapper.VehicleMapper;
 import com.jwalit.inventory_system.repository.VehicleRepository;
 import com.jwalit.inventory_system.repository.VehicleSpecifications;
-import com.jwalit.inventory_system.exception.VehicleNotFoundException;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 
 @Service
+@RequiredArgsConstructor
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
     private final VehicleMapper vehicleMapper;
 
-    public VehicleService(VehicleRepository vehicleRepository, VehicleMapper vehicleMapper) {
-        this.vehicleRepository = vehicleRepository;
-        this.vehicleMapper = vehicleMapper;
-    }
-
+    @Transactional
     public VehicleResponseDTO create(VehicleRequestDTO vehicleRequestDTO) {
         Vehicle vehicle = vehicleMapper.toEntity(vehicleRequestDTO);
         Vehicle saved = vehicleRepository.save(vehicle);
@@ -35,8 +35,8 @@ public class VehicleService {
     }
 
     public Page<VehicleResponseDTO> searchVehicles(String make, String model, String category,
-                                                    java.math.BigDecimal minPrice,
-                                                    java.math.BigDecimal maxPrice,
+                                                    BigDecimal minPrice,
+                                                    BigDecimal maxPrice,
                                                     Pageable pageable) {
         Specification<Vehicle> spec = Specification
                 .where(VehicleSpecifications.hasMake(make))
@@ -49,9 +49,9 @@ public class VehicleService {
                 .map(vehicleMapper::toResponseDto);
     }
 
+    @Transactional
     public VehicleResponseDTO update(Long id, VehicleRequestDTO vehicleRequestDTO) {
-        Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with id: " + id));
+        Vehicle vehicle = vehicleRepository.getVehicleOrThrow(id);
 
         vehicleMapper.updateEntityFromDto(vehicleRequestDTO, vehicle);
 
@@ -59,18 +59,15 @@ public class VehicleService {
         return vehicleMapper.toResponseDto(saved);
     }
 
+    @Transactional
     public void delete(Long id) {
-        Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with id: " + id));
+        Vehicle vehicle = vehicleRepository.getVehicleOrThrow(id);
         vehicleRepository.delete(vehicle);
     }
 
+    @Transactional
     public void restock(Long id, int quantity) {
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Restock quantity must be greater than 0");
-        }
-        Vehicle vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with id: " + id));
+        Vehicle vehicle = vehicleRepository.getVehicleOrThrow(id);
         vehicle.addStock(quantity);
         vehicleRepository.save(vehicle);
     }

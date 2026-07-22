@@ -19,22 +19,28 @@ import java.math.BigDecimal;
 })
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Vehicle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @jakarta.persistence.Column(nullable = false, length = 255)
     private String make;
+    @jakarta.persistence.Column(nullable = false, length = 255)
     private String model;
+    @jakarta.persistence.Column(nullable = false, length = 255)
     private String category;
+    
     @Positive
+    @jakarta.persistence.Column(nullable = false)
     private BigDecimal price;
 
     @PositiveOrZero
+    @jakarta.persistence.Column(nullable = false)
     private Integer quantity;
 
     @jakarta.persistence.Version
@@ -43,5 +49,12 @@ public class Vehicle {
 
     public void addStock(int amount) {
         this.quantity = this.quantity + amount;
+    }
+
+    public void reduceStock(int amount) {
+        if (this.quantity < amount) {
+            throw new com.jwalit.inventory_system.exception.InsufficientStockException("Requested quantity exceeds available stock");
+        }
+        this.quantity = this.quantity - amount;
     }
 }

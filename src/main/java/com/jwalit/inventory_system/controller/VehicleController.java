@@ -3,7 +3,7 @@ package com.jwalit.inventory_system.controller;
 import com.jwalit.inventory_system.dto.RestockRequest;
 import com.jwalit.inventory_system.dto.VehicleRequestDTO;
 import com.jwalit.inventory_system.dto.VehicleResponseDTO;
-import com.jwalit.inventory_system.dto.PaginationRequest;
+
 import com.jwalit.inventory_system.dto.VehicleSearchRequest;
 import com.jwalit.inventory_system.service.VehicleService;
 import jakarta.validation.Valid;
@@ -42,7 +42,6 @@ public class VehicleController {
 
     @GetMapping
     public ResponseEntity<Page<VehicleResponseDTO>> getVehicles(
-            @Valid PaginationRequest paginationRequest,
             Pageable pageable) {
         return ResponseEntity.ok(vehicleService.getVehicles(pageable));
     }
@@ -77,10 +76,10 @@ public class VehicleController {
 
     @PostMapping("/{id}/restock")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, String>> restockVehicle(
+    public ResponseEntity<Void> restockVehicle(
             @PathVariable Long id,
             @Valid @RequestBody RestockRequest restockRequest) {
         vehicleService.restock(id, restockRequest.getQuantity());
-        return ResponseEntity.ok(Map.of("message", "Vehicle restocked successfully"));
+        return ResponseEntity.noContent().build();
     }
 }

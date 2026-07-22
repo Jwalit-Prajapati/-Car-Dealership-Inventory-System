@@ -11,7 +11,17 @@ public interface PurchaseMapper {
 
     @Mapping(target = "purchaseId", source = "id")
     @Mapping(target = "vehicleId", source = "vehicle.id")
-    @Mapping(target = "vehicleName", expression = "java(purchase.getVehicle().getMake() + \" \" + purchase.getVehicle().getModel())")
-    @Mapping(target = "customerName", expression = "java(purchase.getUser().getFirstName() + \" \" + purchase.getUser().getLastName())")
+    @Mapping(target = "vehicleName", source = "vehicle")
+    @Mapping(target = "customerName", source = "user")
     PurchaseResponseDTO toResponseDto(Purchase purchase);
+
+    default String toVehicleName(com.jwalit.inventory_system.entity.Vehicle vehicle) {
+        if (vehicle == null) return null;
+        return vehicle.getMake() + " " + vehicle.getModel();
+    }
+
+    default String toCustomerName(com.jwalit.inventory_system.entity.User user) {
+        if (user == null) return null;
+        return user.getFirstName() + " " + user.getLastName();
+    }
 }

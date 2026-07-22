@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthController {
 
     @GetMapping("/health")
-    public ResponseEntity<ApiResponse<String>> healthCheck() {
-        return ResponseEntity.ok(ApiResponse.success("Health check successful", "UP"));
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("UP");
     }
 }

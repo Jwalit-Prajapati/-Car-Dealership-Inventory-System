@@ -26,12 +26,10 @@ public class AuthService {
     private final JwtService jwtService;
 
     public LoginResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
+        org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("User not found"));
-        String jwtToken = jwtService.generateToken(user.getEmail());
+        String jwtToken = jwtService.generateToken(auth.getName());
         return new LoginResponse(jwtToken);
     }
 

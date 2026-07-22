@@ -10,7 +10,7 @@ public class VehicleSpecifications {
             if (make == null || make.trim().isEmpty()) {
                 return cb.conjunction();
             }
-            return cb.like(cb.lower(root.get("make")), "%" + make.trim().toLowerCase() + "%");
+            return cb.like(cb.lower(root.get("make")), make.trim().toLowerCase() + "%");
         };
     }
 
@@ -28,7 +28,7 @@ public class VehicleSpecifications {
             if (model == null || model.trim().isEmpty()) {
                 return cb.conjunction();
             }
-            return cb.like(cb.lower(root.get("model")), "%" + model.trim().toLowerCase() + "%");
+            return cb.like(cb.lower(root.get("model")), model.trim().toLowerCase() + "%");
         };
     }
 

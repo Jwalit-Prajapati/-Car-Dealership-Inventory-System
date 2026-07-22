@@ -6,18 +6,20 @@ import com.jwalit.inventory_system.entity.Purchase;
 import com.jwalit.inventory_system.entity.User;
 import com.jwalit.inventory_system.entity.Vehicle;
 import com.jwalit.inventory_system.exception.InsufficientStockException;
-import com.jwalit.inventory_system.exception.VehicleNotFoundException;
+
 import com.jwalit.inventory_system.mapper.PurchaseMapper;
 import com.jwalit.inventory_system.repository.PurchaseRepository;
 import com.jwalit.inventory_system.repository.UserRepository;
 import com.jwalit.inventory_system.repository.VehicleRepository;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class PurchaseService {
 
     private final VehicleRepository vehicleRepository;
@@ -25,30 +27,15 @@ public class PurchaseService {
     private final UserRepository userRepository;
     private final PurchaseMapper purchaseMapper;
 
-    public PurchaseService(VehicleRepository vehicleRepository,
-                                PurchaseRepository purchaseRepository,
-                                UserRepository userRepository,
-                                PurchaseMapper purchaseMapper) {
-        this.vehicleRepository = vehicleRepository;
-        this.purchaseRepository = purchaseRepository;
-        this.userRepository = userRepository;
-        this.purchaseMapper = purchaseMapper;
-    }
-
     @Transactional
     public PurchaseResponseDTO purchaseVehicle(PurchaseRequestDTO requestDTO,
-                                               UserDetails userDetails) {
-        Vehicle vehicle = vehicleRepository.findById(requestDTO.getVehicleId())
-                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found"));
+                                               String email) {
+        Vehicle vehicle = vehicleRepository.getVehicleOrThrow(requestDTO.getVehicleId());
 
-        if (vehicle.getQuantity() < requestDTO.getQuantity()) {
-            throw new InsufficientStockException("Requested quantity exceeds available stock");
-        }
-
-        User user = userRepository.findByEmail(userDetails.getUsername())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        vehicle.setQuantity(vehicle.getQuantity() - requestDTO.getQuantity());
+        vehicle.reduceStock(requestDTO.getQuantity());
         vehicleRepository.save(vehicle);
 
         Purchase purchase = new Purchase();

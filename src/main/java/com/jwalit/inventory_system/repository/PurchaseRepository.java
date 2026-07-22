@@ -4,16 +4,20 @@ import com.jwalit.inventory_system.entity.Purchase;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
+import org.springframework.data.jpa.repository.Query;
+import java.util.List;
+import org.springframework.data.domain.Pageable;
+import com.jwalit.inventory_system.dto.VehiclePurchaseCountDto;
 
 @Repository
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
-    @org.springframework.data.jpa.repository.Query("SELECT SUM(p.purchasedPrice * p.quantityPurchased) FROM Purchase p")
+    @Query("SELECT SUM(p.purchasedPrice * p.quantityPurchased) FROM Purchase p")
     BigDecimal getTotalRevenue();
 
-    @org.springframework.data.jpa.repository.Query("SELECT COUNT(p) FROM Purchase p")
+    @Query("SELECT COUNT(p) FROM Purchase p")
     Long getTotalSalesCount();
 
-    @org.springframework.data.jpa.repository.Query("SELECT new com.jwalit.inventory_system.dto.VehiclePurchaseCountDto(p.vehicle, COUNT(p)) FROM Purchase p GROUP BY p.vehicle ORDER BY COUNT(p) DESC")
-    java.util.List<com.jwalit.inventory_system.dto.VehiclePurchaseCountDto> findMostPurchasedVehicleData(org.springframework.data.domain.Pageable pageable);
+    @Query("SELECT new com.jwalit.inventory_system.dto.VehiclePurchaseCountDto(new com.jwalit.inventory_system.dto.VehicleResponseDTO(p.vehicle.id, p.vehicle.make, p.vehicle.model, p.vehicle.category, p.vehicle.price, p.vehicle.quantity), COUNT(p)) FROM Purchase p GROUP BY p.vehicle.id, p.vehicle.make, p.vehicle.model, p.vehicle.category, p.vehicle.price, p.vehicle.quantity ORDER BY COUNT(p) DESC")
+    List<VehiclePurchaseCountDto> findMostPurchasedVehicleData(Pageable pageable);
 }
