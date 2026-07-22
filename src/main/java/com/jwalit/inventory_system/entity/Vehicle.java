@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 @Entity
@@ -18,7 +20,10 @@ public class Vehicle {
     private String make;
     private String model;
     private String category;
+    @Positive
     private BigDecimal price;
+
+    @PositiveOrZero
     private Integer quantity;
 
     public Long getId() {

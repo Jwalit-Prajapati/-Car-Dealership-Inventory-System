@@ -801,3 +801,27 @@ proceed with phase 3
 
 I will commit the GREEN phase changes and then implement MapStruct for mapping the RegistrationRequest to the User entity as part of the REFACTOR phase.
 
+
+## 2026-07-22T15:46:09+05:30
+
+**User Prompt:**
+Configure docker file and docker-compse.yml for this project
+
+**AI Response:**
+Configured Dockerfile using multi-stage build and docker-compose.yml to run PostgreSQL and the app.
+
+## 2026-07-22T15:53:48+05:30
+
+**User Prompt:**
+proceed with green phase
+
+**AI Response:**
+Committed RED phase. Created V4__create_vehicles_table.sql Flyway migration and added @Positive and @PositiveOrZero to Vehicle entity. Reran tests and they pass. Asked for approval for GREEN phase.
+
+## 2026-07-22T16:03:31+05:30
+
+**User Prompt:**
+your not updating PROMPT.md after each phase do that and proceed with phase 3.
+
+**AI Response:**
+I will update PROMPTS.md, commit the GREEN phase, and then perform the REFACTOR phase to add indexes to the database.
