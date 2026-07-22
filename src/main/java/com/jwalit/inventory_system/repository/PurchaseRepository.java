@@ -18,6 +18,6 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     @Query("SELECT COUNT(p) FROM Purchase p")
     Long getTotalSalesCount();
 
-    @Query("SELECT new com.jwalit.inventory_system.dto.VehiclePurchaseCountDto(new com.jwalit.inventory_system.dto.VehicleResponseDTO(p.vehicle.id, p.vehicle.make, p.vehicle.model, p.vehicle.category, p.vehicle.price, p.vehicle.quantity), COUNT(p)) FROM Purchase p GROUP BY p.vehicle.id, p.vehicle.make, p.vehicle.model, p.vehicle.category, p.vehicle.price, p.vehicle.quantity ORDER BY COUNT(p) DESC")
-    List<VehiclePurchaseCountDto> findMostPurchasedVehicleData(Pageable pageable);
+    @Query("SELECT new com.jwalit.inventory_system.repository.VehiclePurchaseCountRow(p.vehicle.id, p.vehicle.make, p.vehicle.model, p.vehicle.category, p.vehicle.price, p.vehicle.quantity, COUNT(p)) FROM Purchase p GROUP BY p.vehicle.id, p.vehicle.make, p.vehicle.model, p.vehicle.category, p.vehicle.price, p.vehicle.quantity ORDER BY COUNT(p) DESC")
+    List<VehiclePurchaseCountRow> findMostPurchasedVehicleData(Pageable pageable);
 }

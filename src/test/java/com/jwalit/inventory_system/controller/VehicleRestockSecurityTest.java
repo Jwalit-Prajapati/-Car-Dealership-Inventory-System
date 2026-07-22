@@ -2,6 +2,7 @@ package com.jwalit.inventory_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jwalit.inventory_system.dto.RestockRequest;
+import com.jwalit.inventory_system.service.StockService;
 import com.jwalit.inventory_system.service.VehicleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,9 @@ class VehicleRestockSecurityTest {
 
     @Mock
     private VehicleService vehicleService;
+
+    @Mock
+    private StockService stockService;
 
     @InjectMocks
     private VehicleController vehicleController;
@@ -89,13 +93,13 @@ class VehicleRestockSecurityTest {
         authenticateAs("ADMIN");
 
         org.mockito.Mockito.doNothing()
-                .when(vehicleService).restock(org.mockito.ArgumentMatchers.anyLong(),
+                .when(stockService).restock(org.mockito.ArgumentMatchers.anyLong(),
                         org.mockito.ArgumentMatchers.anyInt());
 
         mockMvc.perform(post("/api/vehicles/1/restock")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new RestockRequest(5))))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         SecurityContextHolder.clearContext();
     }

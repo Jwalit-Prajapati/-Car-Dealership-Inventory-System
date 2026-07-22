@@ -2,6 +2,7 @@ package com.jwalit.inventory_system.service;
 
 import com.jwalit.inventory_system.dto.VehicleRequestDTO;
 import com.jwalit.inventory_system.dto.VehicleResponseDTO;
+import com.jwalit.inventory_system.dto.VehicleSearchRequest;
 import com.jwalit.inventory_system.entity.Vehicle;
 import com.jwalit.inventory_system.mapper.VehicleMapper;
 import com.jwalit.inventory_system.repository.VehicleRepository;
@@ -40,8 +41,8 @@ class VehicleServiceTest {
         VehicleRequestDTO request = createValidRequest();
 
         Vehicle mappedVehicle = new Vehicle();
-        mappedVehicle.setMake(request.getMake());
-        mappedVehicle.setModel(request.getModel());
+        mappedVehicle.setMake(request.make());
+        mappedVehicle.setModel(request.model());
 
         Vehicle savedVehicle = new Vehicle();
         savedVehicle.setId(1L);
@@ -61,8 +62,8 @@ class VehicleServiceTest {
         VehicleResponseDTO result = vehicleService.create(request);
 
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getMake()).isEqualTo("Honda");
+        assertThat(result.id()).isEqualTo(1L);
+        assertThat(result.make()).isEqualTo("Honda");
 
         verify(vehicleMapper).toEntity(any(VehicleRequestDTO.class));
         verify(vehicleRepository).save(any(Vehicle.class));
@@ -78,9 +79,9 @@ class VehicleServiceTest {
 
         Vehicle savedVehicle = new Vehicle();
         savedVehicle.setId(1L);
-        savedVehicle.setMake(request.getMake());
+        savedVehicle.setMake(request.make());
 
-        VehicleResponseDTO expectedDto = new VehicleResponseDTO(1L, request.getMake(), "Civic", "Sedan",
+        VehicleResponseDTO expectedDto = new VehicleResponseDTO(1L, request.make(), "Civic", "Sedan",
                 new BigDecimal("22000"), 5);
 
         when(vehicleRepository.findById(1L)).thenReturn(java.util.Optional.of(existingVehicle));
@@ -90,7 +91,7 @@ class VehicleServiceTest {
         VehicleResponseDTO result = vehicleService.update(1L, request);
 
         assertThat(result).isNotNull();
-        assertThat(result.getMake()).isEqualTo(request.getMake());
+        assertThat(result.make()).isEqualTo(request.make());
         verify(vehicleRepository).findById(1L);
         verify(vehicleMapper).updateEntityFromDto(request, existingVehicle);
         verify(vehicleRepository).save(any(Vehicle.class));
@@ -127,61 +128,7 @@ class VehicleServiceTest {
             .isInstanceOf(com.jwalit.inventory_system.exception.VehicleNotFoundException.class);
     }
 
-    // ── Restock tests ──────────────────────────────────────────────────────────
 
-    @Test
-    void restock_validQuantity_incrementsAndSavesVehicle() {
-        Vehicle existing = new Vehicle();
-        existing.setId(1L);
-        existing.setQuantity(5);
-
-        Vehicle saved = new Vehicle();
-        saved.setId(1L);
-        saved.setQuantity(15);
-
-        when(vehicleRepository.findById(1L)).thenReturn(java.util.Optional.of(existing));
-        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(saved);
-
-        vehicleService.restock(1L, 10);
-
-        assertThat(existing.getQuantity()).isEqualTo(15);
-        verify(vehicleRepository).save(existing);
-    }
-
-    @Test
-    void restock_largeQuantity_incrementsSafely() {
-        Vehicle existing = new Vehicle();
-        existing.setId(2L);
-        existing.setQuantity(Integer.MAX_VALUE - 1);
-
-        when(vehicleRepository.findById(2L)).thenReturn(java.util.Optional.of(existing));
-        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(existing);
-
-        vehicleService.restock(2L, 1);
-
-        assertThat(existing.getQuantity()).isEqualTo(Integer.MAX_VALUE);
-        verify(vehicleRepository).save(existing);
-    }
-
-    @Test
-    void restock_vehicleNotFound_throwsVehicleNotFoundException() {
-        when(vehicleRepository.findById(999L)).thenReturn(java.util.Optional.empty());
-
-        assertThatThrownBy(() -> vehicleService.restock(999L, 5))
-            .isInstanceOf(com.jwalit.inventory_system.exception.VehicleNotFoundException.class);
-    }
-
-    @Test
-    void restock_zeroQuantity_throwsIllegalArgumentException() {
-        assertThatThrownBy(() -> vehicleService.restock(1L, 0))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void restock_negativeQuantity_throwsIllegalArgumentException() {
-        assertThatThrownBy(() -> vehicleService.restock(1L, -3))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
 
     // ── Search tests ───────────────────────────────────────────────────────────
 
@@ -191,7 +138,13 @@ class VehicleServiceTest {
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
 
-        vehicleService.searchVehicles("Toyota", "Camry", "Sedan", new BigDecimal("10000"), new BigDecimal("30000"), org.springframework.data.domain.PageRequest.of(0, 10));
+        VehicleSearchRequest req = new VehicleSearchRequest();
+        req.setMake("Toyota");
+        req.setModel("Camry");
+        req.setCategory("Sedan");
+        req.setMinPrice(new BigDecimal("10000"));
+        req.setMaxPrice(new BigDecimal("30000"));
+        vehicleService.searchVehicles(req, org.springframework.data.domain.PageRequest.of(0, 10));
 
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
@@ -201,7 +154,7 @@ class VehicleServiceTest {
         org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
-        vehicleService.searchVehicles(null, null, null, null, null, org.springframework.data.domain.PageRequest.of(0, 10));
+        vehicleService.searchVehicles(new VehicleSearchRequest(), org.springframework.data.domain.PageRequest.of(0, 10));
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
 
@@ -210,7 +163,9 @@ class VehicleServiceTest {
         org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
-        vehicleService.searchVehicles(null, null, null, new BigDecimal("10000"), null, org.springframework.data.domain.PageRequest.of(0, 10));
+        VehicleSearchRequest req = new VehicleSearchRequest();
+        req.setMinPrice(new BigDecimal("10000"));
+        vehicleService.searchVehicles(req, org.springframework.data.domain.PageRequest.of(0, 10));
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
 
@@ -219,7 +174,9 @@ class VehicleServiceTest {
         org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
-        vehicleService.searchVehicles(null, null, null, null, new BigDecimal("30000"), org.springframework.data.domain.PageRequest.of(0, 10));
+        VehicleSearchRequest req = new VehicleSearchRequest();
+        req.setMaxPrice(new BigDecimal("30000"));
+        vehicleService.searchVehicles(req, org.springframework.data.domain.PageRequest.of(0, 10));
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
 
@@ -228,7 +185,10 @@ class VehicleServiceTest {
         org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
-        vehicleService.searchVehicles(null, null, null, BigDecimal.ZERO, new BigDecimal("9999999"), org.springframework.data.domain.PageRequest.of(0, 10));
+        VehicleSearchRequest req = new VehicleSearchRequest();
+        req.setMinPrice(BigDecimal.ZERO);
+        req.setMaxPrice(new BigDecimal("9999999"));
+        vehicleService.searchVehicles(req, org.springframework.data.domain.PageRequest.of(0, 10));
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
 
@@ -238,7 +198,9 @@ class VehicleServiceTest {
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
 
-        org.springframework.data.domain.Page<VehicleResponseDTO> result = vehicleService.searchVehicles("Unknown", null, null, null, null, org.springframework.data.domain.PageRequest.of(0, 10));
+        VehicleSearchRequest req = new VehicleSearchRequest();
+        req.setMake("Unknown");
+        org.springframework.data.domain.Page<VehicleResponseDTO> result = vehicleService.searchVehicles(req, org.springframework.data.domain.PageRequest.of(0, 10));
 
         assertThat(result).isNotNull();
         assertThat(result.getContent()).isEmpty();

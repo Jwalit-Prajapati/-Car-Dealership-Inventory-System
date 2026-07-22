@@ -2,6 +2,7 @@ package com.jwalit.inventory_system.service;
 
 import com.jwalit.inventory_system.dto.VehicleRequestDTO;
 import com.jwalit.inventory_system.dto.VehicleResponseDTO;
+import com.jwalit.inventory_system.dto.VehicleSearchRequest;
 import com.jwalit.inventory_system.entity.Vehicle;
 import com.jwalit.inventory_system.mapper.VehicleMapper;
 import com.jwalit.inventory_system.repository.VehicleRepository;
@@ -34,16 +35,14 @@ public class VehicleService {
                 .map(vehicleMapper::toResponseDto);
     }
 
-    public Page<VehicleResponseDTO> searchVehicles(String make, String model, String category,
-                                                    BigDecimal minPrice,
-                                                    BigDecimal maxPrice,
+    public Page<VehicleResponseDTO> searchVehicles(VehicleSearchRequest request,
                                                     Pageable pageable) {
         Specification<Vehicle> spec = Specification
-                .where(VehicleSpecifications.hasMake(make))
-                .and(VehicleSpecifications.hasModel(model))
-                .and(VehicleSpecifications.hasCategory(category))
-                .and(VehicleSpecifications.hasMinimumPrice(minPrice))
-                .and(VehicleSpecifications.hasMaximumPrice(maxPrice));
+                .where(VehicleSpecifications.hasMake(request.getMake()))
+                .and(VehicleSpecifications.hasModel(request.getModel()))
+                .and(VehicleSpecifications.hasCategory(request.getCategory()))
+                .and(VehicleSpecifications.hasMinimumPrice(request.getMinPrice()))
+                .and(VehicleSpecifications.hasMaximumPrice(request.getMaxPrice()));
 
         return vehicleRepository.findAll(spec, pageable)
                 .map(vehicleMapper::toResponseDto);
@@ -51,7 +50,8 @@ public class VehicleService {
 
     @Transactional
     public VehicleResponseDTO update(Long id, VehicleRequestDTO vehicleRequestDTO) {
-        Vehicle vehicle = vehicleRepository.getVehicleOrThrow(id);
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
 
         vehicleMapper.updateEntityFromDto(vehicleRequestDTO, vehicle);
 
@@ -61,14 +61,9 @@ public class VehicleService {
 
     @Transactional
     public void delete(Long id) {
-        Vehicle vehicle = vehicleRepository.getVehicleOrThrow(id);
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
         vehicleRepository.delete(vehicle);
     }
 
-    @Transactional
-    public void restock(Long id, int quantity) {
-        Vehicle vehicle = vehicleRepository.getVehicleOrThrow(id);
-        vehicle.addStock(quantity);
-        vehicleRepository.save(vehicle);
-    }
 }

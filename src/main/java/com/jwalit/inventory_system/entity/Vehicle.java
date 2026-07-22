@@ -57,4 +57,8 @@ public class Vehicle {
         }
         this.quantity = this.quantity - amount;
     }
+
+    public String getDisplayName() {
+        return this.make + " " + this.model;
+    }
 }

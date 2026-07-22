@@ -87,10 +87,10 @@ class PurchaseIntegrationTest {
     void testPurchaseFlow_Success() {
         PurchaseRequestDTO requestDTO = new PurchaseRequestDTO(vehicleId, 3);
 
-        PurchaseResponseDTO purchase = purchaseService.purchaseVehicle(requestDTO, userDetails);
+        PurchaseResponseDTO purchase = purchaseService.purchaseVehicle(requestDTO, userDetails.getUsername());
 
         assertThat(purchase).isNotNull();
-        assertThat(purchase.getPurchaseId()).isNotNull();
+        assertThat(purchase.purchaseId()).isNotNull();
 
         Optional<Vehicle> updatedVehicle = vehicleRepository.findById(vehicleId);
         assertThat(updatedVehicle).isPresent();
@@ -113,7 +113,7 @@ class PurchaseIntegrationTest {
         Runnable purchaseTask = () -> {
             try {
                 startLatch.await();
-                purchaseService.purchaseVehicle(requestDTO, userDetails);
+                purchaseService.purchaseVehicle(requestDTO, userDetails.getUsername());
                 successCount.incrementAndGet();
             } catch (org.springframework.dao.OptimisticLockingFailureException e) {
                 errorCount.incrementAndGet();

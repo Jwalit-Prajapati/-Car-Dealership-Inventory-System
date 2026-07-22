@@ -140,14 +140,13 @@ class PurchaseRepositoryTest {
         createPurchase(vehicle2, new BigDecimal("22000.00"), 1);
         createPurchase(vehicle2, new BigDecimal("22000.00"), 2);
 
-        java.util.List<com.jwalit.inventory_system.dto.VehiclePurchaseCountDto> results = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
+        java.util.List<com.jwalit.inventory_system.repository.VehiclePurchaseCountRow> results = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
         assertThat(results).isNotEmpty();
-        com.jwalit.inventory_system.dto.VehiclePurchaseCountDto firstResult = results.get(0);
-        Vehicle topVehicle = firstResult.getVehicle();
-        Long purchaseCount = firstResult.getPurchaseCount();
+        com.jwalit.inventory_system.repository.VehiclePurchaseCountRow firstResult = results.get(0);
         
-        assertThat(topVehicle.getId()).isEqualTo(vehicle2.getId());
-        assertThat(purchaseCount).isEqualTo(3L);
+        assertThat(firstResult.vehicleId()).isEqualTo(vehicle2.getId());
+        assertThat(firstResult.purchaseCount()).isEqualTo(3L);
+        
     }
 
     @Test
@@ -164,7 +163,7 @@ class PurchaseRepositoryTest {
 
     @Test
     void findMostPurchasedVehicleData_returnsEmpty_whenNoPurchasesExist() {
-        java.util.List<com.jwalit.inventory_system.dto.VehiclePurchaseCountDto> results = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
+        java.util.List<com.jwalit.inventory_system.repository.VehiclePurchaseCountRow> results = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
         assertThat(results).isEmpty();
     }
 }

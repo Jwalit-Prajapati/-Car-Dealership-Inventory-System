@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -87,17 +88,17 @@ class PurchaseControllerTest {
                 100L, 1L, "Toyota Camry", 2,
                 BigDecimal.valueOf(25000), LocalDateTime.now(), "John Doe");
 
-        when(purchaseService.purchaseVehicle(any(PurchaseRequestDTO.class), any(UserDetails.class)))
+        when(purchaseService.purchaseVehicle(any(PurchaseRequestDTO.class), anyString()))
                 .thenReturn(mockResponse);
 
         mockMvc.perform(post("/api/purchases")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.purchaseId").value(100))
                 .andExpect(jsonPath("$.quantityPurchased").value(2));
 
-        verify(purchaseService).purchaseVehicle(any(PurchaseRequestDTO.class), any(UserDetails.class));
+        verify(purchaseService).purchaseVehicle(any(PurchaseRequestDTO.class), anyString());
         SecurityContextHolder.clearContext();
     }
 
@@ -127,7 +128,7 @@ class PurchaseControllerTest {
     void purchaseVehicle_VehicleNotFound() throws Exception {
         manuallySetUserRole("USER");
         requestDTO.setVehicleId(99L);
-        when(purchaseService.purchaseVehicle(any(PurchaseRequestDTO.class), any(UserDetails.class)))
+        when(purchaseService.purchaseVehicle(any(PurchaseRequestDTO.class), anyString()))
                 .thenThrow(new VehicleNotFoundException("Vehicle not found"));
 
         mockMvc.perform(post("/api/purchases")

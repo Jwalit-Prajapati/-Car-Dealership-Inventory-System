@@ -28,11 +28,12 @@ public class SalesStatisticsService {
         Long count = purchaseRepository.getTotalSalesCount();
         response.setTotalSalesCount(count != null ? count : 0L);
 
-        List<VehiclePurchaseCountDto> topVehicleData =
+        List<com.jwalit.inventory_system.repository.VehiclePurchaseCountRow> topVehicleData =
                 purchaseRepository.findMostPurchasedVehicleData(PageRequest.of(0, 1));
 
         if (topVehicleData != null && !topVehicleData.isEmpty()) {
-            VehicleResponseDTO topVehicle = topVehicleData.get(0).getVehicle();
+            com.jwalit.inventory_system.repository.VehiclePurchaseCountRow row = topVehicleData.get(0);
+            VehicleResponseDTO topVehicle = new VehicleResponseDTO(row.vehicleId(), row.make(), row.model(), row.category(), row.price(), row.quantity());
             response.setMostPurchasedVehicle(topVehicle);
         } else {
             response.setMostPurchasedVehicle(null);

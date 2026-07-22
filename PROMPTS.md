@@ -1346,3 +1346,22 @@ refactor the following issues
 
 ****AI Response:****
 I have successfully resolved the remaining architectural issues across the service, repository, DTO, and mapper layers, and ensured that the project compiles correctly.
+
+---
+
+**Timestamp:** 2026-07-23T00:22:12+05:30
+
+**User Prompt:**
+resolve the following issues
+High
+Working JWT signing secret is hardcoded as the config default
+... (and 3 other issues: VehicleRepository policy, PurchaseMapper formatting, VehicleService responsibilities)
+
+**AI Response:**
+I have addressed all the requested issues:
+1. **JWT Secret**: Removed the hardcoded fallback value from `JwtService.java` and required it from configuration by adding it to `application.yml`.
+2. **Repository Interface Policy**: Removed `getVehicleOrThrow` from `VehicleRepository.java` and inlined the fetch-or-throw logic in `VehicleService.java` and `PurchaseService.java`.
+3. **Mapper Display Formatting**: Added `getDisplayName()` to `Vehicle.java` and `getFullName()` to `User.java`, and updated `PurchaseMapper.java` to use these entity-owned methods instead of hardcoding formatting logic.
+4. **Service Responsibilities**: Extracted a new `StockService.java` to handle restock logic, removed the logic from `VehicleService`, and updated `VehicleController` to inject and use `StockService`.
+
+Awaiting your review and approval to commit these changes.

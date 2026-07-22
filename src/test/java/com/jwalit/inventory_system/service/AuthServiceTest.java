@@ -100,10 +100,10 @@ class AuthServiceTest {
     @Test
     void login_validCredentials_returnsJwt() {
         LoginRequest request = new LoginRequest("user@example.com", "password123");
-        User user = new User();
-        user.setEmail("user@example.com");
+        org.springframework.security.core.Authentication auth = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
+        given(auth.getName()).willReturn("user@example.com");
 
-        given(userRepository.findByEmail(request.email())).willReturn(Optional.of(user));
+        given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).willReturn(auth);
         given(jwtService.generateToken("user@example.com")).willReturn("jwt-token");
 
         LoginResponse response = authService.login(request);
@@ -128,7 +128,8 @@ class AuthServiceTest {
     void login_userNotFound_throwsException() {
         LoginRequest request = new LoginRequest("unknown@example.com", "password123");
         
-        given(userRepository.findByEmail(request.email())).willReturn(Optional.empty());
+        given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+            .willThrow(new org.springframework.security.authentication.BadCredentialsException("Bad credentials"));
 
         assertThatThrownBy(() -> authService.login(request))
             .isInstanceOf(org.springframework.security.core.AuthenticationException.class);

@@ -20,8 +20,4 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpec
             """)
     InventoryStatsDto getInventoryStatistics();
 
-    default Vehicle getVehicleOrThrow(Long id) {
-        return findById(id)
-                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
-    }
 }

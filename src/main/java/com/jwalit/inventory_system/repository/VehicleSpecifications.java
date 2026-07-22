@@ -5,6 +5,10 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class VehicleSpecifications {
 
+    private VehicleSpecifications() {
+        // utility class
+    }
+
     public static Specification<Vehicle> hasMake(String make) {
         return (root, query, cb) -> {
             if (make == null || make.trim().isEmpty()) {

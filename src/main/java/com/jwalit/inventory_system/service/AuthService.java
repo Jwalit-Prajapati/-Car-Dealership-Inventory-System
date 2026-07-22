@@ -5,7 +5,7 @@ import com.jwalit.inventory_system.entity.Role;
 import com.jwalit.inventory_system.entity.User;
 import com.jwalit.inventory_system.repository.UserRepository;
 import com.jwalit.inventory_system.mapper.UserMapper;
-import com.jwalit.inventory_system.security.JwtService;
+import com.jwalit.inventory_system.security.TokenService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +23,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+    private final TokenService jwtService;
 
     public LoginResponse login(LoginRequest request) {
         org.springframework.security.core.Authentication auth = authenticationManager.authenticate(

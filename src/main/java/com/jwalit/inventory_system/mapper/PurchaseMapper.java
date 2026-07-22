@@ -17,11 +17,11 @@ public interface PurchaseMapper {
 
     default String toVehicleName(com.jwalit.inventory_system.entity.Vehicle vehicle) {
         if (vehicle == null) return null;
-        return vehicle.getMake() + " " + vehicle.getModel();
+        return vehicle.getDisplayName();
     }
 
     default String toCustomerName(com.jwalit.inventory_system.entity.User user) {
         if (user == null) return null;
-        return user.getFirstName() + " " + user.getLastName();
+        return user.getFullName();
     }
 }

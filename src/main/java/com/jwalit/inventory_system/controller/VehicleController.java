@@ -5,6 +5,7 @@ import com.jwalit.inventory_system.dto.VehicleRequestDTO;
 import com.jwalit.inventory_system.dto.VehicleResponseDTO;
 
 import com.jwalit.inventory_system.dto.VehicleSearchRequest;
+import com.jwalit.inventory_system.service.StockService;
 import com.jwalit.inventory_system.service.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -32,6 +35,7 @@ import java.util.Map;
 public class VehicleController {
 
     private final VehicleService vehicleService;
+    private final StockService stockService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -48,15 +52,10 @@ public class VehicleController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<VehicleResponseDTO>> searchVehicles(
-            @Valid VehicleSearchRequest searchRequest,
-            Pageable pageable) {
-        
+            @Valid @ModelAttribute VehicleSearchRequest request,
+            @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(vehicleService.searchVehicles(
-                searchRequest.getMake(), 
-                searchRequest.getModel(), 
-                searchRequest.getCategory(), 
-                searchRequest.getMinPrice(), 
-                searchRequest.getMaxPrice(), 
+                request, 
                 pageable));
     }
 
@@ -79,7 +78,7 @@ public class VehicleController {
     public ResponseEntity<Void> restockVehicle(
             @PathVariable Long id,
             @Valid @RequestBody RestockRequest restockRequest) {
-        vehicleService.restock(id, restockRequest.getQuantity());
+        stockService.restock(id, restockRequest.getQuantity());
         return ResponseEntity.noContent().build();
     }
 }

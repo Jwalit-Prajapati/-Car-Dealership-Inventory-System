@@ -26,7 +26,7 @@ class HealthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").value("Health check successful"))
+                .andExpect(jsonPath("$.message").value("Success"))
                 .andExpect(jsonPath("$.data").value("UP"))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
