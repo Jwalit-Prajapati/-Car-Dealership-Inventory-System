@@ -11,4 +11,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpecificationExecutor<Vehicle> {
+
+    long countByQuantityLessThan(int quantity);
+
+    long countByQuantity(int quantity);
 }
