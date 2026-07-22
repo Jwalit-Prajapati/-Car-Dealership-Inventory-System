@@ -140,7 +140,7 @@ class PurchaseRepositoryTest {
         createPurchase(vehicle2, new BigDecimal("22000.00"), 1);
         createPurchase(vehicle2, new BigDecimal("22000.00"), 2);
 
-        java.util.List<Object[]> results = purchaseRepository.findMostPurchasedVehicleData();
+        java.util.List<Object[]> results = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
         assertThat(results).isNotEmpty();
         Object[] firstResult = results.get(0);
         Vehicle topVehicle = (Vehicle) firstResult[0];
@@ -164,7 +164,7 @@ class PurchaseRepositoryTest {
 
     @Test
     void findMostPurchasedVehicleData_returnsEmpty_whenNoPurchasesExist() {
-        java.util.List<Object[]> results = purchaseRepository.findMostPurchasedVehicleData();
+        java.util.List<Object[]> results = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
         assertThat(results).isEmpty();
     }
 }

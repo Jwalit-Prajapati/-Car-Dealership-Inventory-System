@@ -26,7 +26,7 @@ public class SalesStatisticsService {
         Long count = purchaseRepository.getTotalSalesCount();
         response.setTotalSalesCount(count != null ? count : 0L);
 
-        List<Object[]> topVehicleData = purchaseRepository.findMostPurchasedVehicleData();
+        List<Object[]> topVehicleData = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
         if (topVehicleData != null && !topVehicleData.isEmpty()) {
             Object[] row = topVehicleData.get(0);
             Vehicle topVehicle = (Vehicle) row[0];
