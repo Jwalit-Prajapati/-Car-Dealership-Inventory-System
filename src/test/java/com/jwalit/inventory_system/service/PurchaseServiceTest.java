@@ -11,7 +11,6 @@ import com.jwalit.inventory_system.mapper.PurchaseMapper;
 import com.jwalit.inventory_system.repository.PurchaseRepository;
 import com.jwalit.inventory_system.repository.UserRepository;
 import com.jwalit.inventory_system.repository.VehicleRepository;
-import com.jwalit.inventory_system.service.Impl.PurchaseServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +47,7 @@ class PurchaseServiceTest {
     private UserDetails userDetails;
 
     @InjectMocks
-    private PurchaseServiceImpl purchaseService;
+    private PurchaseService purchaseService;
 
     private Vehicle vehicle;
     private User user;

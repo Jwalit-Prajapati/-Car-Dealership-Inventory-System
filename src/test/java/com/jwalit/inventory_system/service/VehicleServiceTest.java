@@ -5,7 +5,6 @@ import com.jwalit.inventory_system.dto.VehicleResponseDTO;
 import com.jwalit.inventory_system.entity.Vehicle;
 import com.jwalit.inventory_system.mapper.VehicleMapper;
 import com.jwalit.inventory_system.repository.VehicleRepository;
-import com.jwalit.inventory_system.service.Impl.VehicleServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,7 +29,7 @@ class VehicleServiceTest {
     private VehicleMapper vehicleMapper;
 
     @InjectMocks
-    private VehicleServiceImpl vehicleService;
+    private VehicleService vehicleService;
 
     private VehicleRequestDTO createValidRequest() {
         return new VehicleRequestDTO("Honda", "Civic", "Sedan", new BigDecimal("22000"), 5);

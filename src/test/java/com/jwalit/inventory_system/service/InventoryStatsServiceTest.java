@@ -2,7 +2,6 @@ package com.jwalit.inventory_system.service;
 
 import com.jwalit.inventory_system.dto.InventoryStatsDto;
 import com.jwalit.inventory_system.repository.VehicleRepository;
-import com.jwalit.inventory_system.service.Impl.InventoryStatsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,7 +19,7 @@ class InventoryStatsServiceTest {
     private VehicleRepository vehicleRepository;
 
     @InjectMocks
-    private InventoryStatsServiceImpl inventoryStatsService;
+    private InventoryStatsService inventoryStatsService;
 
     @Test
     void getInventoryStats_returnsCorrectlyMappedDto() {

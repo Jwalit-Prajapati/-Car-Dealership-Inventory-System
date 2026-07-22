@@ -1,7 +1,9 @@
 package com.jwalit.inventory_system.service;
 
 import com.jwalit.inventory_system.dto.SalesStatisticsResponse;
+import com.jwalit.inventory_system.dto.VehicleResponseDTO;
 import com.jwalit.inventory_system.entity.Vehicle;
+import com.jwalit.inventory_system.mapper.VehicleMapper;
 import com.jwalit.inventory_system.repository.PurchaseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,21 +17,26 @@ import java.util.List;
 public class SalesStatisticsService {
 
     private final PurchaseRepository purchaseRepository;
+    private final VehicleMapper vehicleMapper;
 
     @Transactional(readOnly = true)
     public SalesStatisticsResponse getSalesStatistics() {
         SalesStatisticsResponse response = new SalesStatisticsResponse();
-        
+
         BigDecimal revenue = purchaseRepository.getTotalRevenue();
         response.setTotalRevenue(revenue != null ? revenue : BigDecimal.ZERO);
-        
+
         Long count = purchaseRepository.getTotalSalesCount();
         response.setTotalSalesCount(count != null ? count : 0L);
 
-        java.util.List<com.jwalit.inventory_system.repository.VehiclePurchaseCountProjection> topVehicleData = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
+        List<com.jwalit.inventory_system.repository.VehiclePurchaseCountProjection> topVehicleData =
+                purchaseRepository.findMostPurchasedVehicleData(
+                        org.springframework.data.domain.PageRequest.of(0, 1));
+
         if (topVehicleData != null && !topVehicleData.isEmpty()) {
             Vehicle topVehicle = topVehicleData.get(0).getVehicle();
-            response.setMostPurchasedVehicle(topVehicle);
+            VehicleResponseDTO dto = vehicleMapper.toResponseDto(topVehicle);
+            response.setMostPurchasedVehicle(dto);
         } else {
             response.setMostPurchasedVehicle(null);
         }
