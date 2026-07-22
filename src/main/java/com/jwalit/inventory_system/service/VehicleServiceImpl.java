@@ -48,10 +48,22 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public Vehicle update(Long id, VehicleRequestDTO vehicleRequestDTO) {
-        return null;
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
+        
+        vehicle.setMake(vehicleRequestDTO.getMake());
+        vehicle.setModel(vehicleRequestDTO.getModel());
+        vehicle.setCategory(vehicleRequestDTO.getCategory());
+        vehicle.setPrice(vehicleRequestDTO.getPrice());
+        vehicle.setQuantity(vehicleRequestDTO.getQuantity());
+        
+        return vehicleRepository.save(vehicle);
     }
 
     @Override
     public void delete(Long id) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
+        vehicleRepository.delete(vehicle);
     }
 }

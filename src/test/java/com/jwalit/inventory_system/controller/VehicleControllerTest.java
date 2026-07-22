@@ -67,6 +67,7 @@ class VehicleControllerTest {
                     }
                 })
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+                .setControllerAdvice(new com.jwalit.inventory_system.exception.GlobalExceptionHandler())
                 .build();
     }
 
