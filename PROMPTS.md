@@ -1132,3 +1132,30 @@ proceed with phase 3 (Refactor).
 Phase 3 (REFACTOR) completed. Refactored the repository methods to use a single JPQL projection (`getInventoryStatistics()`) that directly returns `InventoryStatsDto`. Simplified the service implementation and updated the tests accordingly.
 
 All 118 tests still pass. Story 14 is complete.
+
+---
+
+**Timestamp:** 2026-07-22T18:43:57+05:30
+
+**User Prompt:**
+Implement **Story 15: Sales and Revenue Analytics** using strict Test-Driven Development (TDD). Follow the RED → GREEN → REFACTOR cycle exactly. Do not skip steps. Do not implement production code before writing the failing tests.
+
+## Story Overview
+
+### Business Goal
+Provide administrators with a dashboard showing total revenue, sales count, and the most purchased vehicle.
+
+### Technical Goal
+Implement:
+
+GET /api/admin/stats/sales
+
+...
+
+**AI Response:**
+
+Phase 1 (RED): Added failing tests for sales aggregation in the repository layer and method declarations to the interface. Tests failed to compile/run because the queries were missing.
+Phase 2 (GREEN): Implemented the required repository queries, created the SalesStatisticsService, defined the SalesStatisticsResponse DTO, and exposed the GET /api/admin/stats/sales endpoint in the DashboardController. All 124 tests passed.
+Phase 3 (REFACTOR): Refactored the most purchased vehicle query to use Pageable, ensuring that we only load the top record into memory rather than fetching all aggregated groups. All 124 tests still pass.
+
+Story 15 is complete.
