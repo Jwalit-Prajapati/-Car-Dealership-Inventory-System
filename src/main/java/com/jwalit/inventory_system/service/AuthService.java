@@ -4,6 +4,7 @@ import com.jwalit.inventory_system.dto.RegistrationRequest;
 import com.jwalit.inventory_system.entity.Role;
 import com.jwalit.inventory_system.entity.User;
 import com.jwalit.inventory_system.repository.UserRepository;
+import com.jwalit.inventory_system.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +14,12 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
     @Transactional
@@ -25,10 +28,7 @@ public class AuthService {
             throw new IllegalArgumentException("Email already in use");
         }
 
-        User user = new User();
-        user.setFirstName(request.firstName());
-        user.setLastName(request.lastName());
-        user.setEmail(request.email());
+        User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(Role.USER);
 

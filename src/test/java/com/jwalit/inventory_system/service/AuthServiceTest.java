@@ -4,6 +4,7 @@ import com.jwalit.inventory_system.dto.RegistrationRequest;
 import com.jwalit.inventory_system.entity.Role;
 import com.jwalit.inventory_system.entity.User;
 import com.jwalit.inventory_system.repository.UserRepository;
+import com.jwalit.inventory_system.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,9 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private UserMapper userMapper;
+
     @InjectMocks
     private AuthService authService;
 
@@ -42,7 +46,13 @@ class AuthServiceTest {
     void registerUser_success() {
         // Given
         RegistrationRequest request = new RegistrationRequest("John", "Doe", "john.doe@example.com", "password123");
+        User mappedUser = new User();
+        mappedUser.setFirstName("John");
+        mappedUser.setLastName("Doe");
+        mappedUser.setEmail("john.doe@example.com");
+
         given(userRepository.findByEmail(request.email())).willReturn(Optional.empty());
+        given(userMapper.toEntity(request)).willReturn(mappedUser);
         given(passwordEncoder.encode(request.password())).willReturn("encoded_password");
 
         // When
