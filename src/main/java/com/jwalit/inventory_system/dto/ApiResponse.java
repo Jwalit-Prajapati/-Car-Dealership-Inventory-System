@@ -1,63 +1,49 @@
 package com.jwalit.inventory_system.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApiResponse<T> {
 
     private boolean success;
     private int status;
     private String message;
     private T data;
-    private final Instant timestamp = Instant.now();
 
-    protected ApiResponse() {
-        // Enforce instantiation via static factories only
-    }
+    @Builder.Default
+    private Instant timestamp = Instant.now();
 
     public static <T> ApiResponse<T> success(T payload) {
-        ApiResponse<T> responseInstance = new ApiResponse<>();
-        responseInstance.success = true;
-        responseInstance.status = 200;
-        responseInstance.message = "Success";
-        responseInstance.data = payload;
-        return responseInstance;
+        return ApiResponse.<T>builder()
+                .success(true)
+                .status(200)
+                .message("Success")
+                .data(payload)
+                .build();
     }
 
     public static <T> ApiResponse<T> success(String customMessage, T payload) {
-        ApiResponse<T> responseInstance = new ApiResponse<>();
-        responseInstance.success = true;
-        responseInstance.status = 200;
-        responseInstance.message = customMessage;
-        responseInstance.data = payload;
-        return responseInstance;
+        return ApiResponse.<T>builder()
+                .success(true)
+                .status(200)
+                .message(customMessage)
+                .data(payload)
+                .build();
     }
 
     public static <T> ApiResponse<T> error(int httpStatus, String errorMessage) {
-        ApiResponse<T> responseInstance = new ApiResponse<>();
-        responseInstance.success = false;
-        responseInstance.status = httpStatus;
-        responseInstance.message = errorMessage;
-        responseInstance.data = null;
-        return responseInstance;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public Instant getTimestamp() {
-        return timestamp;
+        return ApiResponse.<T>builder()
+                .success(false)
+                .status(httpStatus)
+                .message(errorMessage)
+                .build();
     }
 }
