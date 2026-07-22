@@ -179,4 +179,43 @@ class VehicleServiceTest {
         assertThatThrownBy(() -> vehicleService.restock(1L, -3))
             .isInstanceOf(IllegalArgumentException.class);
     }
+
+    // ── Search tests ───────────────────────────────────────────────────────────
+
+    @Test
+    void searchVehicles_withAllFilters_forwardsCorrectly() {
+        org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
+        when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
+            .thenReturn(emptyPage);
+
+        vehicleService.searchVehicles("Toyota", "Camry", "Sedan", new BigDecimal("10000"), new BigDecimal("30000"), org.springframework.data.domain.PageRequest.of(0, 10));
+
+        verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
+    }
+
+    @Test
+    void searchVehicles_validationRejectsNegativePrices() {
+        assertThatThrownBy(() -> vehicleService.searchVehicles(null, null, null, new BigDecimal("-1"), null, org.springframework.data.domain.PageRequest.of(0, 10)))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> vehicleService.searchVehicles(null, null, null, null, new BigDecimal("-1"), org.springframework.data.domain.PageRequest.of(0, 10)))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void searchVehicles_validationRejectsMinGreaterThanMax() {
+        assertThatThrownBy(() -> vehicleService.searchVehicles(null, null, null, new BigDecimal("30000"), new BigDecimal("10000"), org.springframework.data.domain.PageRequest.of(0, 10)))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void searchVehicles_emptyResultsHandledCorrectly() {
+        org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
+        when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
+            .thenReturn(emptyPage);
+
+        org.springframework.data.domain.Page<Vehicle> result = vehicleService.searchVehicles("Unknown", null, null, null, null, org.springframework.data.domain.PageRequest.of(0, 10));
+
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isEmpty();
+    }
 }

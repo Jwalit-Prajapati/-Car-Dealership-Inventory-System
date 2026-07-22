@@ -119,6 +119,108 @@ class VehicleRepositoryTest {
         assertThat(result.getContent()).hasSize(1);
     }
 
+    @Test
+    void findByModel_findsVehicles() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("1000")); v1.setQuantity(1);
+        vehicleRepository.save(v1);
+
+        Page<Vehicle> result = vehicleRepository.findAll(VehicleSpecifications.hasModel("cam"), PageRequest.of(0, 10));
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getModel()).isEqualTo("Camry");
+    }
+
+    @Test
+    void findByMinimumPrice_findsVehicles() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("20000")); v1.setQuantity(1);
+        Vehicle v2 = new Vehicle(); v2.setMake("Ford"); v2.setModel("Focus"); v2.setCategory("Hatchback"); v2.setPrice(new BigDecimal("10000")); v2.setQuantity(1);
+        vehicleRepository.save(v1);
+        vehicleRepository.save(v2);
+
+        Page<Vehicle> result = vehicleRepository.findAll(VehicleSpecifications.hasMinimumPrice(new BigDecimal("15000")), PageRequest.of(0, 10));
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getMake()).isEqualTo("Toyota");
+    }
+
+    @Test
+    void findByMaximumPrice_findsVehicles() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("20000")); v1.setQuantity(1);
+        Vehicle v2 = new Vehicle(); v2.setMake("Ford"); v2.setModel("Focus"); v2.setCategory("Hatchback"); v2.setPrice(new BigDecimal("10000")); v2.setQuantity(1);
+        vehicleRepository.save(v1);
+        vehicleRepository.save(v2);
+
+        Page<Vehicle> result = vehicleRepository.findAll(VehicleSpecifications.hasMaximumPrice(new BigDecimal("15000")), PageRequest.of(0, 10));
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getMake()).isEqualTo("Ford");
+    }
+
+    @Test
+    void findByPriceRange_findsVehicles() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("20000")); v1.setQuantity(1);
+        Vehicle v2 = new Vehicle(); v2.setMake("Ford"); v2.setModel("Focus"); v2.setCategory("Hatchback"); v2.setPrice(new BigDecimal("10000")); v2.setQuantity(1);
+        Vehicle v3 = new Vehicle(); v3.setMake("Honda"); v3.setModel("Civic"); v3.setCategory("Sedan"); v3.setPrice(new BigDecimal("30000")); v3.setQuantity(1);
+        vehicleRepository.save(v1);
+        vehicleRepository.save(v2);
+        vehicleRepository.save(v3);
+
+        Page<Vehicle> result = vehicleRepository.findAll(
+                org.springframework.data.jpa.domain.Specification.where(VehicleSpecifications.hasMinimumPrice(new BigDecimal("15000")))
+                        .and(VehicleSpecifications.hasMaximumPrice(new BigDecimal("25000"))),
+                PageRequest.of(0, 10));
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getMake()).isEqualTo("Toyota");
+    }
+
+    @Test
+    void findByMakeAndModel_findsVehicles() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("20000")); v1.setQuantity(1);
+        Vehicle v2 = new Vehicle(); v2.setMake("Toyota"); v2.setModel("Corolla"); v2.setCategory("Sedan"); v2.setPrice(new BigDecimal("15000")); v2.setQuantity(1);
+        vehicleRepository.save(v1);
+        vehicleRepository.save(v2);
+
+        Page<Vehicle> result = vehicleRepository.findAll(
+                org.springframework.data.jpa.domain.Specification.where(VehicleSpecifications.hasMake("toyota"))
+                        .and(VehicleSpecifications.hasModel("camry")),
+                PageRequest.of(0, 10));
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getModel()).isEqualTo("Camry");
+    }
+
+    @Test
+    void findByAllFilters_findsVehicles() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("20000")); v1.setQuantity(1);
+        vehicleRepository.save(v1);
+
+        Page<Vehicle> result = vehicleRepository.findAll(
+                org.springframework.data.jpa.domain.Specification.where(VehicleSpecifications.hasMake("toyota"))
+                        .and(VehicleSpecifications.hasModel("camry"))
+                        .and(VehicleSpecifications.hasCategory("sedan"))
+                        .and(VehicleSpecifications.hasMinimumPrice(new BigDecimal("10000")))
+                        .and(VehicleSpecifications.hasMaximumPrice(new BigDecimal("30000"))),
+                PageRequest.of(0, 10));
+        assertThat(result.getContent()).hasSize(1);
+    }
+
+    @Test
+    void search_returningNoResults() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("20000")); v1.setQuantity(1);
+        vehicleRepository.save(v1);
+
+        Page<Vehicle> result = vehicleRepository.findAll(VehicleSpecifications.hasModel("focus"), PageRequest.of(0, 10));
+        assertThat(result.getContent()).isEmpty();
+    }
+
+    @Test
+    void search_paginationWorksWithFilters() {
+        for(int i=0; i<15; i++) {
+            Vehicle v = new Vehicle(); v.setMake("Toyota"); v.setModel("Camry"); v.setCategory("Sedan"); v.setPrice(new BigDecimal("20000")); v.setQuantity(1);
+            vehicleRepository.save(v);
+        }
+
+        Page<Vehicle> result = vehicleRepository.findAll(VehicleSpecifications.hasMake("toyota"), PageRequest.of(1, 10));
+        assertThat(result.getContent()).hasSize(5);
+        assertThat(result.getTotalElements()).isEqualTo(15);
+    }
+
     // ── Inventory stats JPQL projection tests ─────────────────────────────────
 
     @Test

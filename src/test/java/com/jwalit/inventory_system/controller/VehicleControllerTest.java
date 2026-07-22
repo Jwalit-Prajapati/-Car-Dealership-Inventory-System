@@ -179,6 +179,77 @@ class VehicleControllerTest {
     }
 
     @Test
+    void searchVehicles_byModel_returns200() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("model", "Camry")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void searchVehicles_byMinimumPrice_returns200() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("minimumPrice", "15000")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void searchVehicles_byMaximumPrice_returns200() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("maximumPrice", "25000")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void searchVehicles_withCombinedFilters_returns200() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("make", "Toyota")
+                .param("model", "Camry")
+                .param("category", "Sedan")
+                .param("minimumPrice", "15000")
+                .param("maximumPrice", "35000")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void searchVehicles_invalidMinPrice_returns400() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("minimumPrice", "-500")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void searchVehicles_invalidMaxPrice_returns400() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("maximumPrice", "-500")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void searchVehicles_minGreaterThanMaxPrice_returns400() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("minimumPrice", "30000")
+                .param("maximumPrice", "20000")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void searchVehicles_paginationWorksWithFilters() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("make", "Toyota")
+                .param("page", "1")
+                .param("size", "5")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @WithMockUser(roles = "ADMIN")
     void updateVehicle_asAdmin_returns200() throws Exception {
         manuallySetUserRole("ADMIN");
