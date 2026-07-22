@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: inventory-system
+  datasource:
+    url: jdbc:postgresql://localhost:5432/inventory_db
+    username: myuser
+    password: mypassword
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
