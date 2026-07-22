@@ -25,7 +25,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -51,8 +50,7 @@ class VehicleControllerTest {
                 .addInterceptors(new HandlerInterceptor() {
                     @Override
                     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-                        if (handler instanceof HandlerMethod) {
-                            HandlerMethod handlerMethod = (HandlerMethod) handler;
+                        if (handler instanceof HandlerMethod handlerMethod) {
                             PreAuthorize preAuthorize = handlerMethod.getMethodAnnotation(PreAuthorize.class);
                             if (preAuthorize != null) {
                                 var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -75,12 +73,16 @@ class VehicleControllerTest {
         );
     }
 
+    private VehicleRequestDTO createValidRequest() {
+        return new VehicleRequestDTO("Toyota", "Camry", "Sedan", new BigDecimal("25000"), 10);
+    }
+
     @Test
     @WithMockUser(roles = "ADMIN")
     void createVehicle_asAdmin_returns201() throws Exception {
-        manuallySetUserRole("ADMIN"); // Workaround for standalone setup without SpringExtension
+        manuallySetUserRole("ADMIN"); 
 
-        VehicleRequestDTO request = new VehicleRequestDTO("Toyota", "Camry", "Sedan", new BigDecimal("25000"), 10);
+        VehicleRequestDTO request = createValidRequest();
         Vehicle mockVehicle = new Vehicle();
         mockVehicle.setId(1L);
 
@@ -97,13 +99,11 @@ class VehicleControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void createVehicle_asUser_returns403() throws Exception {
-        manuallySetUserRole("USER"); // Workaround for standalone setup without SpringExtension
-
-        VehicleRequestDTO request = new VehicleRequestDTO("Toyota", "Camry", "Sedan", new BigDecimal("25000"), 10);
+        manuallySetUserRole("USER"); 
 
         mockMvc.perform(post("/api/vehicles")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(createValidRequest())))
                 .andExpect(status().isForbidden());
                 
         SecurityContextHolder.clearContext();

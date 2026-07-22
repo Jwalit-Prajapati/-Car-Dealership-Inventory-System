@@ -2,6 +2,7 @@ package com.jwalit.inventory_system.service;
 
 import com.jwalit.inventory_system.dto.VehicleRequestDTO;
 import com.jwalit.inventory_system.entity.Vehicle;
+import com.jwalit.inventory_system.mapper.VehicleMapper;
 import com.jwalit.inventory_system.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 
@@ -9,9 +10,11 @@ import org.springframework.stereotype.Service;
 public class VehicleServiceImpl implements VehicleService {
 
     private final VehicleRepository vehicleRepository;
+    private final VehicleMapper vehicleMapper;
 
-    public VehicleServiceImpl(VehicleRepository vehicleRepository) {
+    public VehicleServiceImpl(VehicleRepository vehicleRepository, VehicleMapper vehicleMapper) {
         this.vehicleRepository = vehicleRepository;
+        this.vehicleMapper = vehicleMapper;
     }
 
     @Override
@@ -20,13 +23,7 @@ public class VehicleServiceImpl implements VehicleService {
             throw new IllegalArgumentException("VehicleRequestDTO cannot be null");
         }
         
-        Vehicle vehicle = new Vehicle();
-        vehicle.setMake(vehicleRequestDTO.getMake());
-        vehicle.setModel(vehicleRequestDTO.getModel());
-        vehicle.setCategory(vehicleRequestDTO.getCategory());
-        vehicle.setPrice(vehicleRequestDTO.getPrice());
-        vehicle.setQuantity(vehicleRequestDTO.getQuantity());
-
+        Vehicle vehicle = vehicleMapper.toEntity(vehicleRequestDTO);
         return vehicleRepository.save(vehicle);
     }
 }
