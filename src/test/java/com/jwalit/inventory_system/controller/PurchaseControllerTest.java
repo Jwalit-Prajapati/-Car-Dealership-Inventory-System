@@ -59,6 +59,20 @@ class PurchaseControllerTest {
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(purchaseController)
                 .setControllerAdvice(new com.jwalit.inventory_system.exception.GlobalExceptionHandler())
+                .setCustomArgumentResolvers(new org.springframework.web.method.support.HandlerMethodArgumentResolver() {
+                    @Override
+                    public boolean supportsParameter(org.springframework.core.MethodParameter parameter) {
+                        return parameter.getParameterAnnotation(org.springframework.security.core.annotation.AuthenticationPrincipal.class) != null;
+                    }
+                    @Override
+                    public Object resolveArgument(org.springframework.core.MethodParameter parameter, org.springframework.web.method.support.ModelAndViewContainer mavContainer, org.springframework.web.context.request.NativeWebRequest webRequest, org.springframework.web.bind.support.WebDataBinderFactory binderFactory) {
+                        return org.springframework.security.core.userdetails.User.builder()
+                                .username("customer")
+                                .password("password")
+                                .roles("CUSTOMER")
+                                .build();
+                    }
+                })
                 .build();
         requestDTO = new PurchaseRequestDTO(2);
     }

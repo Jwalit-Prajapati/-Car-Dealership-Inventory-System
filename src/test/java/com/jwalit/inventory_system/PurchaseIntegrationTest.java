@@ -50,7 +50,7 @@ class PurchaseIntegrationTest {
     
     // We create a mock UserDetails
     private UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-            .username("integrationUser")
+            .username("integration@test.com")
             .password("password")
             .roles("CUSTOMER")
             .build();

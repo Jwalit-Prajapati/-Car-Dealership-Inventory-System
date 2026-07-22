@@ -129,8 +129,6 @@ class PurchaseServiceTest {
     @Test
     void testPurchaseVehicle_InsufficientStock() {
         requestDTO.setQuantity(6);
-        when(userDetails.getUsername()).thenReturn("test@test.com");
-        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(user));
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
 
         assertThrows(InsufficientStockException.class, () -> 
