@@ -1,6 +1,7 @@
 package com.jwalit.inventory_system;
 
 import com.jwalit.inventory_system.dto.PurchaseRequestDTO;
+import com.jwalit.inventory_system.dto.PurchaseResponseDTO;
 import com.jwalit.inventory_system.entity.Purchase;
 import com.jwalit.inventory_system.entity.User;
 import com.jwalit.inventory_system.entity.Vehicle;
@@ -86,10 +87,10 @@ class PurchaseIntegrationTest {
     void testPurchaseFlow_Success() {
         PurchaseRequestDTO requestDTO = new PurchaseRequestDTO(3);
 
-        Purchase purchase = purchaseService.purchaseVehicle(vehicleId, requestDTO, userDetails);
+        PurchaseResponseDTO purchase = purchaseService.purchaseVehicle(vehicleId, requestDTO, userDetails);
 
         assertThat(purchase).isNotNull();
-        assertThat(purchase.getId()).isNotNull();
+        assertThat(purchase.getPurchaseId()).isNotNull();
 
         Optional<Vehicle> updatedVehicle = vehicleRepository.findById(vehicleId);
         assertThat(updatedVehicle).isPresent();

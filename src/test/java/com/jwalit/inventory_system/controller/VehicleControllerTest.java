@@ -2,7 +2,7 @@ package com.jwalit.inventory_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jwalit.inventory_system.dto.VehicleRequestDTO;
-import com.jwalit.inventory_system.entity.Vehicle;
+import com.jwalit.inventory_system.dto.VehicleResponseDTO;
 import com.jwalit.inventory_system.service.VehicleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,7 +79,7 @@ class VehicleControllerTest {
 
     private void manuallySetUserRole(String role) {
         SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("user", "password", 
+                new UsernamePasswordAuthenticationToken("user", "password",
                         Arrays.asList(new SimpleGrantedAuthority("ROLE_" + role)))
         );
     }
@@ -88,35 +88,35 @@ class VehicleControllerTest {
         return new VehicleRequestDTO("Toyota", "Camry", "Sedan", new BigDecimal("25000"), 10);
     }
 
+    private VehicleResponseDTO createMockResponse(Long id) {
+        return new VehicleResponseDTO(id, "Toyota", "Camry", "Sedan", new BigDecimal("25000"), 10);
+    }
+
     @Test
     @WithMockUser(roles = "ADMIN")
     void createVehicle_asAdmin_returns201() throws Exception {
-        manuallySetUserRole("ADMIN"); 
+        manuallySetUserRole("ADMIN");
 
-        VehicleRequestDTO request = createValidRequest();
-        Vehicle mockVehicle = new Vehicle();
-        mockVehicle.setId(1L);
-
-        when(vehicleService.create(any(VehicleRequestDTO.class))).thenReturn(mockVehicle);
+        when(vehicleService.create(any(VehicleRequestDTO.class))).thenReturn(createMockResponse(1L));
 
         mockMvc.perform(post("/api/vehicles")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(createValidRequest())))
                 .andExpect(status().isCreated());
-        
+
         SecurityContextHolder.clearContext();
     }
 
     @Test
     @WithMockUser(roles = "USER")
     void createVehicle_asUser_returns403() throws Exception {
-        manuallySetUserRole("USER"); 
+        manuallySetUserRole("USER");
 
         mockMvc.perform(post("/api/vehicles")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createValidRequest())))
                 .andExpect(status().isForbidden());
-                
+
         SecurityContextHolder.clearContext();
     }
 
@@ -131,7 +131,7 @@ class VehicleControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
-                
+
         SecurityContextHolder.clearContext();
     }
 
@@ -253,17 +253,16 @@ class VehicleControllerTest {
     @WithMockUser(roles = "ADMIN")
     void updateVehicle_asAdmin_returns200() throws Exception {
         manuallySetUserRole("ADMIN");
-        VehicleRequestDTO request = createValidRequest();
-        Vehicle mockVehicle = new Vehicle();
-        mockVehicle.setId(1L);
 
-        when(vehicleService.update(any(Long.class), any(VehicleRequestDTO.class))).thenReturn(mockVehicle);
+        when(vehicleService.update(any(Long.class), any(VehicleRequestDTO.class)))
+                .thenReturn(createMockResponse(1L));
 
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/vehicles/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(createValidRequest())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
+
         SecurityContextHolder.clearContext();
     }
 
@@ -296,13 +295,13 @@ class VehicleControllerTest {
     @WithMockUser(roles = "ADMIN")
     void updateVehicle_notFound_returns404() throws Exception {
         manuallySetUserRole("ADMIN");
-        VehicleRequestDTO request = createValidRequest();
 
-        when(vehicleService.update(any(Long.class), any(VehicleRequestDTO.class))).thenThrow(new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found"));
+        when(vehicleService.update(any(Long.class), any(VehicleRequestDTO.class)))
+                .thenThrow(new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found"));
 
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/vehicles/999")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(createValidRequest())))
                 .andExpect(status().isNotFound());
         SecurityContextHolder.clearContext();
     }
@@ -332,7 +331,8 @@ class VehicleControllerTest {
     void deleteVehicle_notFound_returns404() throws Exception {
         manuallySetUserRole("ADMIN");
 
-        org.mockito.Mockito.doThrow(new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found")).when(vehicleService).delete(any(Long.class));
+        org.mockito.Mockito.doThrow(new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found"))
+                .when(vehicleService).delete(any(Long.class));
 
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/vehicles/999"))
                 .andExpect(status().isNotFound());
@@ -424,4 +424,3 @@ class VehicleControllerTest {
         SecurityContextHolder.clearContext();
     }
 }
-

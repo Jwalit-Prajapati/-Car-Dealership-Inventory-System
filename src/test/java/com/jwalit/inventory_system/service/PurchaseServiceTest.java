@@ -1,11 +1,13 @@
 package com.jwalit.inventory_system.service;
 
 import com.jwalit.inventory_system.dto.PurchaseRequestDTO;
+import com.jwalit.inventory_system.dto.PurchaseResponseDTO;
 import com.jwalit.inventory_system.entity.Purchase;
 import com.jwalit.inventory_system.entity.User;
 import com.jwalit.inventory_system.entity.Vehicle;
 import com.jwalit.inventory_system.exception.InsufficientStockException;
 import com.jwalit.inventory_system.exception.VehicleNotFoundException;
+import com.jwalit.inventory_system.mapper.PurchaseMapper;
 import com.jwalit.inventory_system.repository.PurchaseRepository;
 import com.jwalit.inventory_system.repository.UserRepository;
 import com.jwalit.inventory_system.repository.VehicleRepository;
@@ -17,8 +19,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +40,9 @@ class PurchaseServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PurchaseMapper purchaseMapper;
 
     @Mock
     private UserDetails userDetails;
@@ -75,26 +83,30 @@ class PurchaseServiceTest {
             return p;
         });
 
-        Purchase purchase = purchaseService.purchaseVehicle(1L, requestDTO, userDetails);
+        PurchaseResponseDTO expectedDto = new PurchaseResponseDTO(
+                100L, 1L, "Toyota null", 2, BigDecimal.valueOf(25000),
+                LocalDateTime.now(), "Test User");
+        when(purchaseMapper.toResponseDto(any(Purchase.class))).thenReturn(expectedDto);
 
-        assertThat(purchase).isNotNull();
-        assertThat(purchase.getId()).isEqualTo(100L);
-        assertThat(purchase.getQuantityPurchased()).isEqualTo(2);
-        assertThat(purchase.getPurchasedPrice()).isEqualTo(BigDecimal.valueOf(25000));
-        assertThat(purchase.getUser()).isEqualTo(user);
-        assertThat(purchase.getVehicle()).isEqualTo(vehicle);
+        PurchaseResponseDTO result = purchaseService.purchaseVehicle(1L, requestDTO, userDetails);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPurchaseId()).isEqualTo(100L);
+        assertThat(result.getQuantityPurchased()).isEqualTo(2);
+        assertThat(result.getPurchasedPrice()).isEqualTo(BigDecimal.valueOf(25000));
 
         assertThat(vehicle.getQuantity()).isEqualTo(3);
 
         verify(vehicleRepository).save(vehicle);
         verify(purchaseRepository).save(any(Purchase.class));
+        verify(purchaseMapper).toResponseDto(any(Purchase.class));
     }
 
     @Test
     void testPurchaseVehicle_VehicleNotFound() {
         when(vehicleRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(VehicleNotFoundException.class, () -> 
+        assertThrows(VehicleNotFoundException.class, () ->
             purchaseService.purchaseVehicle(99L, requestDTO, userDetails)
         );
 
@@ -102,13 +114,12 @@ class PurchaseServiceTest {
         verify(vehicleRepository, never()).save(any());
     }
 
-
     @Test
     void testPurchaseVehicle_InsufficientStock() {
         requestDTO.setQuantity(6);
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
 
-        assertThrows(InsufficientStockException.class, () -> 
+        assertThrows(InsufficientStockException.class, () ->
             purchaseService.purchaseVehicle(1L, requestDTO, userDetails)
         );
 

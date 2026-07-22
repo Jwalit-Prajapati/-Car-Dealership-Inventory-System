@@ -1,6 +1,7 @@
 package com.jwalit.inventory_system.service;
 
 import com.jwalit.inventory_system.dto.VehicleRequestDTO;
+import com.jwalit.inventory_system.dto.VehicleResponseDTO;
 import com.jwalit.inventory_system.entity.Vehicle;
 import com.jwalit.inventory_system.mapper.VehicleMapper;
 import com.jwalit.inventory_system.repository.VehicleRepository;
@@ -38,7 +39,7 @@ class VehicleServiceTest {
     @Test
     void create_validRequest_savesAndReturnsVehicle() {
         VehicleRequestDTO request = createValidRequest();
-        
+
         Vehicle mappedVehicle = new Vehicle();
         mappedVehicle.setMake(request.getMake());
         mappedVehicle.setModel(request.getModel());
@@ -51,20 +52,23 @@ class VehicleServiceTest {
         savedVehicle.setPrice(new BigDecimal("22000"));
         savedVehicle.setQuantity(5);
 
+        VehicleResponseDTO expectedDto = new VehicleResponseDTO(1L, "Honda", "Civic", "Sedan",
+                new BigDecimal("22000"), 5);
+
         when(vehicleMapper.toEntity(any(VehicleRequestDTO.class))).thenReturn(mappedVehicle);
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(savedVehicle);
+        when(vehicleMapper.toResponseDto(savedVehicle)).thenReturn(expectedDto);
 
-        Vehicle result = vehicleService.create(request);
+        VehicleResponseDTO result = vehicleService.create(request);
 
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getMake()).isEqualTo("Honda");
-        
+
         verify(vehicleMapper).toEntity(any(VehicleRequestDTO.class));
         verify(vehicleRepository).save(any(Vehicle.class));
+        verify(vehicleMapper).toResponseDto(savedVehicle);
     }
-    
-
 
     @Test
     void update_validRequest_updatesAndReturnsVehicle() {
@@ -72,29 +76,33 @@ class VehicleServiceTest {
         Vehicle existingVehicle = new Vehicle();
         existingVehicle.setId(1L);
         existingVehicle.setMake("Old Make");
-        
+
+        Vehicle savedVehicle = new Vehicle();
+        savedVehicle.setId(1L);
+        savedVehicle.setMake(request.getMake());
+
+        VehicleResponseDTO expectedDto = new VehicleResponseDTO(1L, request.getMake(), "Civic", "Sedan",
+                new BigDecimal("22000"), 5);
+
         when(vehicleRepository.findById(1L)).thenReturn(java.util.Optional.of(existingVehicle));
-        
-        Vehicle updatedVehicle = new Vehicle();
-        updatedVehicle.setId(1L);
-        updatedVehicle.setMake(request.getMake());
-        
-        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(updatedVehicle);
-        
-        Vehicle result = vehicleService.update(1L, request);
-        
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(savedVehicle);
+        when(vehicleMapper.toResponseDto(savedVehicle)).thenReturn(expectedDto);
+
+        VehicleResponseDTO result = vehicleService.update(1L, request);
+
         assertThat(result).isNotNull();
         assertThat(result.getMake()).isEqualTo(request.getMake());
         verify(vehicleRepository).findById(1L);
         verify(vehicleMapper).updateEntityFromDto(request, existingVehicle);
         verify(vehicleRepository).save(any(Vehicle.class));
+        verify(vehicleMapper).toResponseDto(savedVehicle);
     }
 
     @Test
     void update_vehicleNotFound_throwsException() {
         VehicleRequestDTO request = createValidRequest();
         when(vehicleRepository.findById(999L)).thenReturn(java.util.Optional.empty());
-        
+
         assertThatThrownBy(() -> vehicleService.update(999L, request))
             .isInstanceOf(com.jwalit.inventory_system.exception.VehicleNotFoundException.class);
     }
@@ -103,11 +111,11 @@ class VehicleServiceTest {
     void delete_existingVehicle_deletesVehicle() {
         Vehicle existingVehicle = new Vehicle();
         existingVehicle.setId(1L);
-        
+
         when(vehicleRepository.findById(1L)).thenReturn(java.util.Optional.of(existingVehicle));
-        
+
         vehicleService.delete(1L);
-        
+
         verify(vehicleRepository).findById(1L);
         verify(vehicleRepository).delete(existingVehicle);
     }
@@ -115,7 +123,7 @@ class VehicleServiceTest {
     @Test
     void delete_vehicleNotFound_throwsException() {
         when(vehicleRepository.findById(999L)).thenReturn(java.util.Optional.empty());
-        
+
         assertThatThrownBy(() -> vehicleService.delete(999L))
             .isInstanceOf(com.jwalit.inventory_system.exception.VehicleNotFoundException.class);
     }
@@ -224,13 +232,14 @@ class VehicleServiceTest {
         vehicleService.searchVehicles(null, null, null, BigDecimal.ZERO, new BigDecimal("9999999"), org.springframework.data.domain.PageRequest.of(0, 10));
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
+
     @Test
     void searchVehicles_emptyResultsHandledCorrectly() {
         org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
 
-        org.springframework.data.domain.Page<Vehicle> result = vehicleService.searchVehicles("Unknown", null, null, null, null, org.springframework.data.domain.PageRequest.of(0, 10));
+        org.springframework.data.domain.Page<VehicleResponseDTO> result = vehicleService.searchVehicles("Unknown", null, null, null, null, org.springframework.data.domain.PageRequest.of(0, 10));
 
         assertThat(result).isNotNull();
         assertThat(result.getContent()).isEmpty();

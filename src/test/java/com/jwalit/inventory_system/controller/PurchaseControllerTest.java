@@ -2,7 +2,7 @@ package com.jwalit.inventory_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jwalit.inventory_system.dto.PurchaseRequestDTO;
-import com.jwalit.inventory_system.entity.Purchase;
+import com.jwalit.inventory_system.dto.PurchaseResponseDTO;
 import com.jwalit.inventory_system.exception.VehicleNotFoundException;
 import com.jwalit.inventory_system.service.PurchaseService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -43,14 +45,14 @@ class PurchaseControllerTest {
     private PurchaseController purchaseController;
 
     private PurchaseRequestDTO requestDTO;
-    
+
     private void manuallySetUserRole(String role) {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(org.springframework.security.core.userdetails.User.builder()
                         .username("customer")
                         .password("password")
                         .roles("CUSTOMER")
-                        .build(), "password", 
+                        .build(), "password",
                         Arrays.asList(new SimpleGrantedAuthority("ROLE_" + role)))
         );
     }
@@ -80,18 +82,19 @@ class PurchaseControllerTest {
     @Test
     void purchaseVehicle_Success() throws Exception {
         manuallySetUserRole("CUSTOMER");
-        Purchase mockPurchase = new Purchase();
-        mockPurchase.setId(100L);
-        mockPurchase.setQuantityPurchased(2);
+
+        PurchaseResponseDTO mockResponse = new PurchaseResponseDTO(
+                100L, 1L, "Toyota Camry", 2,
+                BigDecimal.valueOf(25000), LocalDateTime.now(), "John Doe");
 
         when(purchaseService.purchaseVehicle(eq(1L), any(PurchaseRequestDTO.class), any(UserDetails.class)))
-                .thenReturn(mockPurchase);
+                .thenReturn(mockResponse);
 
         mockMvc.perform(post("/api/vehicles/1/purchase")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(100))
+                .andExpect(jsonPath("$.purchaseId").value(100))
                 .andExpect(jsonPath("$.quantityPurchased").value(2));
 
         verify(purchaseService).purchaseVehicle(eq(1L), any(PurchaseRequestDTO.class), any(UserDetails.class));

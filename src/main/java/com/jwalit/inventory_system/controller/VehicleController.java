@@ -2,21 +2,25 @@ package com.jwalit.inventory_system.controller;
 
 import com.jwalit.inventory_system.dto.RestockRequest;
 import com.jwalit.inventory_system.dto.VehicleRequestDTO;
-import com.jwalit.inventory_system.entity.Vehicle;
+import com.jwalit.inventory_system.dto.VehicleResponseDTO;
 import com.jwalit.inventory_system.service.VehicleService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
 import java.util.Map;
 
 @RestController
@@ -31,13 +35,13 @@ public class VehicleController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Vehicle> createVehicle(@Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
-        Vehicle createdVehicle = vehicleService.create(vehicleRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdVehicle);
+    public ResponseEntity<VehicleResponseDTO> createVehicle(@Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
+        VehicleResponseDTO created = vehicleService.create(vehicleRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping
-    public ResponseEntity<Page<Vehicle>> getVehicles(
+    public ResponseEntity<Page<VehicleResponseDTO>> getVehicles(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
             Pageable pageable) {
@@ -48,34 +52,35 @@ public class VehicleController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Vehicle>> searchVehicles(
+    public ResponseEntity<Page<VehicleResponseDTO>> searchVehicles(
             @RequestParam(required = false) String make,
             @RequestParam(required = false) String model,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) java.math.BigDecimal minPrice,
-            @RequestParam(required = false) java.math.BigDecimal maxPrice,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
             Pageable pageable) {
-            
-        if (minPrice != null && minPrice.compareTo(java.math.BigDecimal.ZERO) < 0) {
+
+        if (minPrice != null && minPrice.compareTo(BigDecimal.ZERO) < 0) {
             return ResponseEntity.badRequest().build();
         }
-        if (maxPrice != null && maxPrice.compareTo(java.math.BigDecimal.ZERO) < 0) {
+        if (maxPrice != null && maxPrice.compareTo(BigDecimal.ZERO) < 0) {
             return ResponseEntity.badRequest().build();
         }
         if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
             return ResponseEntity.badRequest().build();
         }
-        
+
         return ResponseEntity.ok(vehicleService.searchVehicles(make, model, category, minPrice, maxPrice, pageable));
     }
 
-    @org.springframework.web.bind.annotation.PutMapping("/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Vehicle> updateVehicle(@org.springframework.web.bind.annotation.PathVariable Long id, @Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
+    public ResponseEntity<VehicleResponseDTO> updateVehicle(@PathVariable Long id,
+                                                             @Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
         return ResponseEntity.ok(vehicleService.update(id, vehicleRequestDTO));
     }
 
-    @org.springframework.web.bind.annotation.DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
         vehicleService.delete(id);

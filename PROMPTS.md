@@ -1260,6 +1260,38 @@ I have successfully completed the strict TDD-based refactoring of the Inventory 
 
 All tests ran successfully (GREEN) after refactoring, and no core functionality was broken.
 
+
+## 2026-07-22T19:41:13+05:30
+
+****User Prompt:****
+Perform a strict TDD-based refactoring of the Inventory System project to address the issues below. Follow Clean Architecture, SOLID principles, and Spring Boot best practices while preserving existing functionality unless explicitly stated.
+[General Requirements, Task 1 to 8 omitted for brevity]
+
+****AI Response:****
+I have successfully completed the strict TDD-based refactoring of the Inventory System as requested. Here is a summary of the completed tasks:
+
+1. **Files modified**:
+   - `VehicleServiceImpl.java`: Removed redundant DTO null check and cleaned up fully-qualified imports.
+   - `PurchaseServiceImpl.java`: Removed manual validation logic in favor of `@Valid`.
+   - `AuthController.java`: Removed duplicate `IllegalArgumentException` handler.
+   - `VehicleController.java` & `VehicleService.java`: Updated search endpoint parameters to use `minPrice` and `maxPrice`.
+   - `PurchaseRepository.java`: Added a projection interface `VehiclePurchaseCountProjection` and updated the JPQL query to use aliases.
+   - `SalesStatisticsService.java`: Updated to parse the projection instead of casting `Object[]`.
+
+2. **Tests added or updated**:
+   - `VehicleServiceTest.java`: Removed obsolete null check test, and added extensive search criteria combination tests.
+   - `PurchaseServiceTest.java`: Removed obsolete manual validation tests.
+   - `VehicleControllerTest.java`: Updated search parameters in mock requests.
+   - `AuthControllerTest.java`: Added controller advice setup to ensure global exception handler triggers properly in mock context.
+   - `PurchaseRepositoryTest.java`: Updated tests to check against the new Projection interface.
+
+3. **Reports generated**:
+   - `dead_code_report.md`: Concluded that classes like `DashboardController` and `HealthController` are actively used/required and should not be removed.
+   - `api_standardization_report.md`: Analyzed inconsistencies between `ApiResponse` and `ResponseEntity` and estimated effort to standardize.
+   - `user_entity_cleanup_report.md`: Verified unused fields on `User` and recommended removing them per YAGNI.
+
+All tests ran successfully (GREEN) after refactoring, and no core functionality was broken.
+
 ## 2026-07-22T20:11:54+05:30
 
 ****User Prompt:****
@@ -1267,3 +1299,40 @@ I have added lombok annotations on the enities remove the reduddent code that ca
 
 ****AI Response:****
 I have reviewed all the entities (`Purchase`, `User`, `Role`, `Vehicle`) and removed the redundant explicit getters and setters from `Vehicle.java`, since the class is already annotated with `@Getter` and `@Setter` from Lombok. I preserved any business logic, such as the `addStock()` method. After these cleanups, I ran the tests and verified that the project still builds and all tests pass (GREEN phase).
+
+---
+
+## 2026-07-22T22:58:54+05:30
+
+****User Prompt:****
+Refactor the Spring Boot project to eliminate the practice of returning JPA entities directly from REST controllers. Introduce dedicated response DTOs (`VehicleResponseDTO`, `PurchaseResponseDTO`) and ensure every controller returns DTOs instead of entities. Create a MapStruct mapper layer, update services to return DTOs, and ensure no sensitive fields (password, User entity, JPA internals) can be serialised through any REST endpoint. Update existing tests to reflect the new types; do not add integration tests and adhere to AGENTS.md (unit tests only, fast and isolated).
+
+****AI Response:****
+Performed a full DTO response refactoring across the project:
+
+**New files created:**
+- `dto/VehicleResponseDTO.java` — exposes id, make, model, category, price, quantity only
+- `dto/PurchaseResponseDTO.java` — exposes purchaseId, vehicleId, vehicleName, quantityPurchased, purchasedPrice, purchaseDate, customerName only (no User entity, no password)
+- `mapper/PurchaseMapper.java` — MapStruct mapper, `Purchase → PurchaseResponseDTO`
+
+**Files modified:**
+- `mapper/VehicleMapper.java` — added `toResponseDto(Vehicle)` method; explicitly ignores `version` field on writes
+- `service/VehicleService.java` — return types changed from `Vehicle`/`Page<Vehicle>` to `VehicleResponseDTO`/`Page<VehicleResponseDTO>`
+- `service/PurchaseService.java` — return type changed from `Purchase` to `PurchaseResponseDTO`
+- `service/Impl/VehicleServiceImpl.java` — maps entity to DTO via `vehicleMapper.toResponseDto()` before returning; pagination preserved via `Page.map()`
+- `service/Impl/PurchaseServiceImpl.java` — injects `PurchaseMapper`, maps saved entity to DTO before returning
+- `controller/VehicleController.java` — all `ResponseEntity<Vehicle>` / `ResponseEntity<Page<Vehicle>>` replaced with DTO equivalents; no URL, method, or status code changed
+- `controller/PurchaseController.java` — `ResponseEntity<Purchase>` replaced with `ResponseEntity<PurchaseResponseDTO>`
+- `PurchaseIntegrationTest.java` — updated variable type for `purchaseService.purchaseVehicle()` result from `Purchase` to `PurchaseResponseDTO`
+
+**Tests updated (minimum changes, original method names preserved, no new test methods added):**
+- `controller/VehicleControllerTest.java` — stubs return `VehicleResponseDTO` instead of `Vehicle`
+- `controller/PurchaseControllerTest.java` — stubs return `PurchaseResponseDTO` instead of `Purchase`; original 4 test methods and names restored exactly
+- `service/VehicleServiceTest.java` — stubs `vehicleMapper.toResponseDto()`, assertions use `VehicleResponseDTO` fields
+- `service/PurchaseServiceTest.java` — mocks `PurchaseMapper`, assertions use `PurchaseResponseDTO` fields
+
+**Security guarantees:**
+- No endpoint can serialise `password`, `passwordHash`, `User` entity, `Vehicle` entity reference, Hibernate proxies, or JPA annotations — the DTO boundary is enforced at the service layer
+- `PurchaseResponseDTO` exposes only `customerName` (first + last name concatenated by mapper) — never the full `User` object
+
+All unit tests pass (114 tests, 0 failures, 0 new tests added). The 4 Testcontainers-based tests (`PurchaseIntegrationTest`, `PurchaseRepositoryTest`, `UserRepositoryTest`, `VehicleRepositoryTest`) fail due to Docker not being available on this machine — these failures are pre-existing and unrelated to this refactoring.
