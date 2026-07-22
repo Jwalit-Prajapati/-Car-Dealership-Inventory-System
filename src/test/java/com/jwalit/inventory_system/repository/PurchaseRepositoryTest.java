@@ -140,9 +140,9 @@ class PurchaseRepositoryTest {
         createPurchase(vehicle2, new BigDecimal("22000.00"), 1);
         createPurchase(vehicle2, new BigDecimal("22000.00"), 2);
 
-        java.util.List<VehiclePurchaseCountProjection> results = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
+        java.util.List<com.jwalit.inventory_system.dto.VehiclePurchaseCountDto> results = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
         assertThat(results).isNotEmpty();
-        VehiclePurchaseCountProjection firstResult = results.get(0);
+        com.jwalit.inventory_system.dto.VehiclePurchaseCountDto firstResult = results.get(0);
         Vehicle topVehicle = firstResult.getVehicle();
         Long purchaseCount = firstResult.getPurchaseCount();
         
@@ -164,7 +164,7 @@ class PurchaseRepositoryTest {
 
     @Test
     void findMostPurchasedVehicleData_returnsEmpty_whenNoPurchasesExist() {
-        java.util.List<VehiclePurchaseCountProjection> results = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
+        java.util.List<com.jwalit.inventory_system.dto.VehiclePurchaseCountDto> results = purchaseRepository.findMostPurchasedVehicleData(org.springframework.data.domain.PageRequest.of(0, 1));
         assertThat(results).isEmpty();
     }
 }

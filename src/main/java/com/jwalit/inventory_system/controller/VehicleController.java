@@ -42,35 +42,23 @@ public class VehicleController {
 
     @GetMapping
     public ResponseEntity<Page<VehicleResponseDTO>> getVehicles(
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size,
+            @Valid com.jwalit.inventory_system.dto.PaginationRequest paginationRequest,
             Pageable pageable) {
-        if ((page != null && page < 0) || (size != null && size <= 0)) {
-            return ResponseEntity.badRequest().build();
-        }
         return ResponseEntity.ok(vehicleService.getVehicles(pageable));
     }
 
     @GetMapping("/search")
     public ResponseEntity<Page<VehicleResponseDTO>> searchVehicles(
-            @RequestParam(required = false) String make,
-            @RequestParam(required = false) String model,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
+            @Valid com.jwalit.inventory_system.dto.VehicleSearchRequest searchRequest,
             Pageable pageable) {
-
-        if (minPrice != null && minPrice.compareTo(BigDecimal.ZERO) < 0) {
-            return ResponseEntity.badRequest().build();
-        }
-        if (maxPrice != null && maxPrice.compareTo(BigDecimal.ZERO) < 0) {
-            return ResponseEntity.badRequest().build();
-        }
-        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        return ResponseEntity.ok(vehicleService.searchVehicles(make, model, category, minPrice, maxPrice, pageable));
+        
+        return ResponseEntity.ok(vehicleService.searchVehicles(
+                searchRequest.getMake(), 
+                searchRequest.getModel(), 
+                searchRequest.getCategory(), 
+                searchRequest.getMinPrice(), 
+                searchRequest.getMaxPrice(), 
+                pageable));
     }
 
     @PutMapping("/{id}")

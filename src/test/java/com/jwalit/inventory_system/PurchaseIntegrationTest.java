@@ -85,9 +85,9 @@ class PurchaseIntegrationTest {
 
     @Test
     void testPurchaseFlow_Success() {
-        PurchaseRequestDTO requestDTO = new PurchaseRequestDTO(3);
+        PurchaseRequestDTO requestDTO = new PurchaseRequestDTO(vehicleId, 3);
 
-        PurchaseResponseDTO purchase = purchaseService.purchaseVehicle(vehicleId, requestDTO, userDetails);
+        PurchaseResponseDTO purchase = purchaseService.purchaseVehicle(requestDTO, userDetails);
 
         assertThat(purchase).isNotNull();
         assertThat(purchase.getPurchaseId()).isNotNull();
@@ -102,7 +102,7 @@ class PurchaseIntegrationTest {
 
     @Test
     void testPurchaseFlow_Concurrency() throws InterruptedException {
-        PurchaseRequestDTO requestDTO = new PurchaseRequestDTO(1);
+        PurchaseRequestDTO requestDTO = new PurchaseRequestDTO(vehicleId, 1);
         
         java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newFixedThreadPool(2);
         java.util.concurrent.CountDownLatch startLatch = new java.util.concurrent.CountDownLatch(1);
@@ -113,7 +113,7 @@ class PurchaseIntegrationTest {
         Runnable purchaseTask = () -> {
             try {
                 startLatch.await();
-                purchaseService.purchaseVehicle(vehicleId, requestDTO, userDetails);
+                purchaseService.purchaseVehicle(requestDTO, userDetails);
                 successCount.incrementAndGet();
             } catch (org.springframework.dao.OptimisticLockingFailureException e) {
                 errorCount.incrementAndGet();

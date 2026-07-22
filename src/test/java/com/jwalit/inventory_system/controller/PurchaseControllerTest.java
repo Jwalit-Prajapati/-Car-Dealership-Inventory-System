@@ -76,7 +76,7 @@ class PurchaseControllerTest {
                     }
                 })
                 .build();
-        requestDTO = new PurchaseRequestDTO(2);
+        requestDTO = new PurchaseRequestDTO(1L, 2);
     }
 
     @Test
@@ -87,17 +87,17 @@ class PurchaseControllerTest {
                 100L, 1L, "Toyota Camry", 2,
                 BigDecimal.valueOf(25000), LocalDateTime.now(), "John Doe");
 
-        when(purchaseService.purchaseVehicle(eq(1L), any(PurchaseRequestDTO.class), any(UserDetails.class)))
+        when(purchaseService.purchaseVehicle(any(PurchaseRequestDTO.class), any(UserDetails.class)))
                 .thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/vehicles/1/purchase")
+        mockMvc.perform(post("/api/purchases")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.purchaseId").value(100))
                 .andExpect(jsonPath("$.quantityPurchased").value(2));
 
-        verify(purchaseService).purchaseVehicle(eq(1L), any(PurchaseRequestDTO.class), any(UserDetails.class));
+        verify(purchaseService).purchaseVehicle(any(PurchaseRequestDTO.class), any(UserDetails.class));
         SecurityContextHolder.clearContext();
     }
 
@@ -106,7 +106,7 @@ class PurchaseControllerTest {
         manuallySetUserRole("CUSTOMER");
         requestDTO.setQuantity(0);
 
-        mockMvc.perform(post("/api/vehicles/1/purchase")
+        mockMvc.perform(post("/api/purchases")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
@@ -126,10 +126,11 @@ class PurchaseControllerTest {
     @Test
     void purchaseVehicle_VehicleNotFound() throws Exception {
         manuallySetUserRole("CUSTOMER");
-        when(purchaseService.purchaseVehicle(eq(99L), any(PurchaseRequestDTO.class), any(UserDetails.class)))
+        requestDTO.setVehicleId(99L);
+        when(purchaseService.purchaseVehicle(any(PurchaseRequestDTO.class), any(UserDetails.class)))
                 .thenThrow(new VehicleNotFoundException("Vehicle not found"));
 
-        mockMvc.perform(post("/api/vehicles/99/purchase")
+        mockMvc.perform(post("/api/purchases")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isNotFound());

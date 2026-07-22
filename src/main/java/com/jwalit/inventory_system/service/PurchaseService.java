@@ -36,9 +36,9 @@ public class PurchaseService {
     }
 
     @Transactional
-    public PurchaseResponseDTO purchaseVehicle(Long vehicleId, PurchaseRequestDTO requestDTO,
+    public PurchaseResponseDTO purchaseVehicle(PurchaseRequestDTO requestDTO,
                                                UserDetails userDetails) {
-        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+        Vehicle vehicle = vehicleRepository.findById(requestDTO.getVehicleId())
                 .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found"));
 
         if (vehicle.getQuantity() < requestDTO.getQuantity()) {

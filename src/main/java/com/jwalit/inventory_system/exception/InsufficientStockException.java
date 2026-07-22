@@ -1,7 +1,9 @@
 package com.jwalit.inventory_system.exception;
 
-public class InsufficientStockException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class InsufficientStockException extends ApiException {
     public InsufficientStockException(String message) {
-        super(message);
+        super(message, HttpStatus.BAD_REQUEST);
     }
 }

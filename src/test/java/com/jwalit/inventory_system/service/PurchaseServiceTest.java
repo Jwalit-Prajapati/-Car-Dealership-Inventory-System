@@ -68,7 +68,7 @@ class PurchaseServiceTest {
         user.setFirstName("Test");
         user.setLastName("User");
 
-        requestDTO = new PurchaseRequestDTO(2);
+        requestDTO = new PurchaseRequestDTO(1L, 2);
     }
 
     @Test
@@ -87,7 +87,7 @@ class PurchaseServiceTest {
                 LocalDateTime.now(), "Test User");
         when(purchaseMapper.toResponseDto(any(Purchase.class))).thenReturn(expectedDto);
 
-        PurchaseResponseDTO result = purchaseService.purchaseVehicle(1L, requestDTO, userDetails);
+        PurchaseResponseDTO result = purchaseService.purchaseVehicle(requestDTO, userDetails);
 
         assertThat(result).isNotNull();
         assertThat(result.getPurchaseId()).isEqualTo(100L);
@@ -103,10 +103,11 @@ class PurchaseServiceTest {
 
     @Test
     void testPurchaseVehicle_VehicleNotFound() {
+        requestDTO.setVehicleId(99L);
         when(vehicleRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(VehicleNotFoundException.class, () ->
-            purchaseService.purchaseVehicle(99L, requestDTO, userDetails)
+            purchaseService.purchaseVehicle(requestDTO, userDetails)
         );
 
         verify(purchaseRepository, never()).save(any());
@@ -119,7 +120,7 @@ class PurchaseServiceTest {
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
 
         assertThrows(InsufficientStockException.class, () ->
-            purchaseService.purchaseVehicle(1L, requestDTO, userDetails)
+            purchaseService.purchaseVehicle(requestDTO, userDetails)
         );
 
         verify(purchaseRepository, never()).save(any());

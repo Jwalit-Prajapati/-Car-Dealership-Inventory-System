@@ -29,7 +29,7 @@ public class SalesStatisticsService {
         Long count = purchaseRepository.getTotalSalesCount();
         response.setTotalSalesCount(count != null ? count : 0L);
 
-        List<com.jwalit.inventory_system.repository.VehiclePurchaseCountProjection> topVehicleData =
+        List<com.jwalit.inventory_system.dto.VehiclePurchaseCountDto> topVehicleData =
                 purchaseRepository.findMostPurchasedVehicleData(
                         org.springframework.data.domain.PageRequest.of(0, 1));
 
