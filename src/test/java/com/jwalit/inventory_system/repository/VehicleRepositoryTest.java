@@ -13,6 +13,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import jakarta.validation.ConstraintViolationException;
 import java.math.BigDecimal;
 import java.util.Optional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -81,5 +83,36 @@ class VehicleRepositoryTest {
 
         assertThatThrownBy(() -> vehicleRepository.saveAndFlush(vehicle))
                 .isInstanceOf(ConstraintViolationException.class);
+    }
+
+    @Test
+    void findByMakeContainingIgnoreCase_findsVehicles() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("1000")); v1.setQuantity(1);
+        Vehicle v2 = new Vehicle(); v2.setMake("Ford"); v2.setModel("Focus"); v2.setCategory("Hatchback"); v2.setPrice(new BigDecimal("1000")); v2.setQuantity(1);
+        vehicleRepository.save(v1);
+        vehicleRepository.save(v2);
+
+        Page<Vehicle> result = vehicleRepository.findByMakeContainingIgnoreCase("toy", PageRequest.of(0, 10));
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getMake()).isEqualTo("Toyota");
+    }
+
+    @Test
+    void findByCategoryIgnoreCase_findsVehicles() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("1000")); v1.setQuantity(1);
+        vehicleRepository.save(v1);
+
+        Page<Vehicle> result = vehicleRepository.findByCategoryIgnoreCase("sedan", PageRequest.of(0, 10));
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getCategory()).isEqualTo("Sedan");
+    }
+
+    @Test
+    void findByMakeAndCategory_findsVehicles() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("1000")); v1.setQuantity(1);
+        vehicleRepository.save(v1);
+
+        Page<Vehicle> result = vehicleRepository.findByMakeContainingIgnoreCaseAndCategoryIgnoreCase("toy", "sedan", PageRequest.of(0, 10));
+        assertThat(result.getContent()).hasSize(1);
     }
 }

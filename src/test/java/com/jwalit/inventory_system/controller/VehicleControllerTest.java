@@ -29,7 +29,9 @@ import java.util.Arrays;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(MockitoExtension.class)
 class VehicleControllerTest {
@@ -122,5 +124,48 @@ class VehicleControllerTest {
                 .andExpect(status().isBadRequest());
                 
         SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void getVehicles_returnsPaginatedVehicles() throws Exception {
+        mockMvc.perform(get("/api/vehicles")
+                .param("page", "0")
+                .param("size", "10")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getVehicles_invalidPagination_returns400() throws Exception {
+        mockMvc.perform(get("/api/vehicles")
+                .param("page", "-1")
+                .param("size", "0")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void searchVehicles_byMake_returns200() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("make", "Toyota")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void searchVehicles_byCategory_returns200() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("category", "Sedan")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void searchVehicles_byMakeAndCategory_returns200() throws Exception {
+        mockMvc.perform(get("/api/vehicles/search")
+                .param("make", "Toyota")
+                .param("category", "Sedan")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }
