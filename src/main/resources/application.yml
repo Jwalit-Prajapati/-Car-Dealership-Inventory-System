@@ -3,8 +3,8 @@ spring:
     name: inventory-system
   datasource:
     url: jdbc:postgresql://localhost:5432/inventory_db
-    username: myuser
-    password: mypassword
+    username: admin
+    password: admin@123
     driver-class-name: org.postgresql.Driver
   flyway:
     enabled: true
