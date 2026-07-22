@@ -1083,3 +1083,29 @@ Phase 3 (REFACTOR) complete. Two targeted changes, no behaviour altered:
 
 All 103 tests pass (BUILD SUCCESS). Committed as `refactor(inventory): move stock logic to vehicle domain entity` and pushed. Story 13 is complete — all three TDD phases (RED → GREEN → REFACTOR) are done with individual commits.
 
+---
+
+## 2026-07-22T18:17:43+05:30
+
+**User Prompt:**
+
+Story 14: Inventory Analytics Endpoint (Admin Only) — implement using strict TDD.
+
+Business Goal: Provide inventory analytics (total vehicles, low-stock alerts, out-of-stock stats) for the Admin Dashboard.
+
+Technical Goal: `GET /api/admin/stats/inventory` returning `InventoryStatsDto { totalVehicles, lowStockVehicles, outOfStockVehicles }`.
+
+Low stock = quantity < 5, out of stock = quantity == 0. Admin-only endpoint (USER → 403, anonymous → 401).
+
+Phase 1 — RED: Write only failing tests for `DashboardControllerTest`, `InventoryStatsServiceTest`, and extend `VehicleRepositoryTest` with count method tests. Stop and wait for approval.
+
+**AI Response:**
+
+Phase 1 (RED) completed. Created three test files:
+
+1. `DashboardControllerTest` — standalone MockMvc tests verifying ADMIN 200 with correct JSON, USER 403, anonymous 401, and empty inventory zeros.
+2. `InventoryStatsServiceTest` — Mockito unit tests for all edge cases (empty, all in stock, all low stock, all out of stock, mixed, DTO mapping, repository invocations).
+3. Extended `VehicleRepositoryTest` — added `count_returnsCorrectTotalVehicleCount`, `countByQuantityLessThan_returnsLowStockCount`, `countByQuantity_returnsOutOfStockCount`, `count_emptyRepository_returnsZero`.
+
+Build fails with 7 compilation errors (cannot find symbol: InventoryStatsDto, InventoryStatsService, DashboardController, InventoryStatsServiceImpl) — confirming correct RED state. Awaiting approval to commit and proceed to GREEN.
+

@@ -118,4 +118,54 @@ class VehicleRepositoryTest {
                 PageRequest.of(0, 10));
         assertThat(result.getContent()).hasSize(1);
     }
+
+    // ── Inventory stats count tests ────────────────────────────────────────────
+
+    @Test
+    void count_returnsCorrectTotalVehicleCount() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("25000")); v1.setQuantity(10);
+        Vehicle v2 = new Vehicle(); v2.setMake("Honda"); v2.setModel("Civic"); v2.setCategory("Sedan"); v2.setPrice(new BigDecimal("20000")); v2.setQuantity(3);
+        Vehicle v3 = new Vehicle(); v3.setMake("Ford"); v3.setModel("Focus"); v3.setCategory("Hatchback"); v3.setPrice(new BigDecimal("18000")); v3.setQuantity(0);
+        vehicleRepository.save(v1);
+        vehicleRepository.save(v2);
+        vehicleRepository.save(v3);
+
+        long total = vehicleRepository.count();
+
+        assertThat(total).isEqualTo(3L);
+    }
+
+    @Test
+    void countByQuantityLessThan_returnsLowStockCount() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("25000")); v1.setQuantity(10);
+        Vehicle v2 = new Vehicle(); v2.setMake("Honda"); v2.setModel("Civic"); v2.setCategory("Sedan"); v2.setPrice(new BigDecimal("20000")); v2.setQuantity(3);
+        Vehicle v3 = new Vehicle(); v3.setMake("Ford"); v3.setModel("Focus"); v3.setCategory("Hatchback"); v3.setPrice(new BigDecimal("18000")); v3.setQuantity(0);
+        vehicleRepository.save(v1);
+        vehicleRepository.save(v2);
+        vehicleRepository.save(v3);
+
+        long lowStock = vehicleRepository.countByQuantityLessThan(5);
+
+        assertThat(lowStock).isEqualTo(2L);
+    }
+
+    @Test
+    void countByQuantity_returnsOutOfStockCount() {
+        Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("25000")); v1.setQuantity(10);
+        Vehicle v2 = new Vehicle(); v2.setMake("Honda"); v2.setModel("Civic"); v2.setCategory("Sedan"); v2.setPrice(new BigDecimal("20000")); v2.setQuantity(0);
+        Vehicle v3 = new Vehicle(); v3.setMake("Ford"); v3.setModel("Focus"); v3.setCategory("Hatchback"); v3.setPrice(new BigDecimal("18000")); v3.setQuantity(0);
+        vehicleRepository.save(v1);
+        vehicleRepository.save(v2);
+        vehicleRepository.save(v3);
+
+        long outOfStock = vehicleRepository.countByQuantity(0);
+
+        assertThat(outOfStock).isEqualTo(2L);
+    }
+
+    @Test
+    void count_emptyRepository_returnsZero() {
+        long total = vehicleRepository.count();
+        assertThat(total).isEqualTo(0L);
+    }
 }
