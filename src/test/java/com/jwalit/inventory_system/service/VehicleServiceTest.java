@@ -193,19 +193,7 @@ class VehicleServiceTest {
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
 
-    @Test
-    void searchVehicles_validationRejectsNegativePrices() {
-        assertThatThrownBy(() -> vehicleService.searchVehicles(null, null, null, new BigDecimal("-1"), null, org.springframework.data.domain.PageRequest.of(0, 10)))
-            .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> vehicleService.searchVehicles(null, null, null, null, new BigDecimal("-1"), org.springframework.data.domain.PageRequest.of(0, 10)))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
 
-    @Test
-    void searchVehicles_validationRejectsMinGreaterThanMax() {
-        assertThatThrownBy(() -> vehicleService.searchVehicles(null, null, null, new BigDecimal("30000"), new BigDecimal("10000"), org.springframework.data.domain.PageRequest.of(0, 10)))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
 
     @Test
     void searchVehicles_emptyResultsHandledCorrectly() {

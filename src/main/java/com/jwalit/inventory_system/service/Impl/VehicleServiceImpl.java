@@ -36,13 +36,22 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public Page<Vehicle> searchVehicles(String make, String category, Pageable pageable) {
+    public Page<Vehicle> searchVehicles(String make, String model, String category, java.math.BigDecimal minimumPrice, java.math.BigDecimal maximumPrice, Pageable pageable) {
         org.springframework.data.jpa.domain.Specification<Vehicle> spec = (root, query, cb) -> cb.conjunction();
         if (make != null && !make.trim().isEmpty()) {
             spec = spec.and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasMake(make));
         }
+        if (model != null && !model.trim().isEmpty()) {
+            spec = spec.and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasModel(model));
+        }
         if (category != null && !category.trim().isEmpty()) {
             spec = spec.and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasCategory(category));
+        }
+        if (minimumPrice != null) {
+            spec = spec.and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasMinimumPrice(minimumPrice));
+        }
+        if (maximumPrice != null) {
+            spec = spec.and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasMaximumPrice(maximumPrice));
         }
         return vehicleRepository.findAll(spec, pageable);
     }

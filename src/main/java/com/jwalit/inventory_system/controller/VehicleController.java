@@ -50,9 +50,23 @@ public class VehicleController {
     @GetMapping("/search")
     public ResponseEntity<Page<Vehicle>> searchVehicles(
             @RequestParam(required = false) String make,
+            @RequestParam(required = false) String model,
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) java.math.BigDecimal minimumPrice,
+            @RequestParam(required = false) java.math.BigDecimal maximumPrice,
             Pageable pageable) {
-        return ResponseEntity.ok(vehicleService.searchVehicles(make, category, pageable));
+            
+        if (minimumPrice != null && minimumPrice.compareTo(java.math.BigDecimal.ZERO) < 0) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (maximumPrice != null && maximumPrice.compareTo(java.math.BigDecimal.ZERO) < 0) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (minimumPrice != null && maximumPrice != null && minimumPrice.compareTo(maximumPrice) > 0) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        return ResponseEntity.ok(vehicleService.searchVehicles(make, model, category, minimumPrice, maximumPrice, pageable));
     }
 
     @org.springframework.web.bind.annotation.PutMapping("/{id}")

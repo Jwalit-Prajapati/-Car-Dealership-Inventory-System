@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 public interface VehicleService {
     Vehicle create(VehicleRequestDTO vehicleRequestDTO);
     Page<Vehicle> getVehicles(Pageable pageable);
-    Page<Vehicle> searchVehicles(String make, String category, Pageable pageable);
+    Page<Vehicle> searchVehicles(String make, String model, String category, java.math.BigDecimal minimumPrice, java.math.BigDecimal maximumPrice, Pageable pageable);
     Vehicle update(Long id, VehicleRequestDTO vehicleRequestDTO);
     void delete(Long id);
     void restock(Long id, int quantity);
