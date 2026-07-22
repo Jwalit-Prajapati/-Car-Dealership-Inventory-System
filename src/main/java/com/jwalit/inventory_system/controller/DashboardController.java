@@ -13,14 +13,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
 
     private final InventoryStatsService inventoryStatsService;
+    private final com.jwalit.inventory_system.service.SalesStatisticsService salesStatisticsService;
 
-    public DashboardController(InventoryStatsService inventoryStatsService) {
+    public DashboardController(InventoryStatsService inventoryStatsService, com.jwalit.inventory_system.service.SalesStatisticsService salesStatisticsService) {
         this.inventoryStatsService = inventoryStatsService;
+        this.salesStatisticsService = salesStatisticsService;
     }
 
     @GetMapping("/inventory")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<InventoryStatsDto> getInventoryStats() {
         return ResponseEntity.ok(inventoryStatsService.getInventoryStats());
+    }
+
+    @GetMapping("/sales")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<com.jwalit.inventory_system.dto.SalesStatisticsResponse> getSalesStats() {
+        return ResponseEntity.ok(salesStatisticsService.getSalesStatistics());
     }
 }
