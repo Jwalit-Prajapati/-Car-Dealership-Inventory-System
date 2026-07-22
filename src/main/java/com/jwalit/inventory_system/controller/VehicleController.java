@@ -78,7 +78,7 @@ public class VehicleController {
     public ResponseEntity<Void> restockVehicle(
             @PathVariable Long id,
             @Valid @RequestBody RestockRequest restockRequest) {
-        stockService.restock(id, restockRequest.getQuantity());
+        stockService.restock(id, restockRequest.quantity());
         return ResponseEntity.noContent().build();
     }
 }

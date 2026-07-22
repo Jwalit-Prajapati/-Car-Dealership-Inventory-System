@@ -28,9 +28,9 @@ class InventoryStatsServiceTest {
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
-        assertThat(result.getTotalVehicles()).isEqualTo(125L);
-        assertThat(result.getLowStockVehicles()).isEqualTo(18L);
-        assertThat(result.getOutOfStockVehicles()).isEqualTo(6L);
+        assertThat(result.totalVehicles()).isEqualTo(125L);
+        assertThat(result.lowStockVehicles()).isEqualTo(18L);
+        assertThat(result.outOfStockVehicles()).isEqualTo(6L);
         verify(vehicleRepository).getInventoryStatistics();
     }
 
@@ -41,9 +41,9 @@ class InventoryStatsServiceTest {
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
-        assertThat(result.getTotalVehicles()).isEqualTo(0L);
-        assertThat(result.getLowStockVehicles()).isEqualTo(0L);
-        assertThat(result.getOutOfStockVehicles()).isEqualTo(0L);
+        assertThat(result.totalVehicles()).isEqualTo(0L);
+        assertThat(result.lowStockVehicles()).isEqualTo(0L);
+        assertThat(result.outOfStockVehicles()).isEqualTo(0L);
     }
 
     @Test
@@ -53,9 +53,9 @@ class InventoryStatsServiceTest {
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
-        assertThat(result.getTotalVehicles()).isEqualTo(50L);
-        assertThat(result.getLowStockVehicles()).isEqualTo(0L);
-        assertThat(result.getOutOfStockVehicles()).isEqualTo(0L);
+        assertThat(result.totalVehicles()).isEqualTo(50L);
+        assertThat(result.lowStockVehicles()).isEqualTo(0L);
+        assertThat(result.outOfStockVehicles()).isEqualTo(0L);
     }
 
     @Test
@@ -65,9 +65,9 @@ class InventoryStatsServiceTest {
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
-        assertThat(result.getTotalVehicles()).isEqualTo(10L);
-        assertThat(result.getLowStockVehicles()).isEqualTo(10L);
-        assertThat(result.getOutOfStockVehicles()).isEqualTo(0L);
+        assertThat(result.totalVehicles()).isEqualTo(10L);
+        assertThat(result.lowStockVehicles()).isEqualTo(10L);
+        assertThat(result.outOfStockVehicles()).isEqualTo(0L);
     }
 
     @Test
@@ -77,9 +77,9 @@ class InventoryStatsServiceTest {
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
-        assertThat(result.getTotalVehicles()).isEqualTo(8L);
-        assertThat(result.getLowStockVehicles()).isEqualTo(8L);
-        assertThat(result.getOutOfStockVehicles()).isEqualTo(8L);
+        assertThat(result.totalVehicles()).isEqualTo(8L);
+        assertThat(result.lowStockVehicles()).isEqualTo(8L);
+        assertThat(result.outOfStockVehicles()).isEqualTo(8L);
     }
 
     @Test
@@ -89,9 +89,9 @@ class InventoryStatsServiceTest {
 
         InventoryStatsDto result = inventoryStatsService.getInventoryStats();
 
-        assertThat(result.getTotalVehicles()).isEqualTo(100L);
-        assertThat(result.getLowStockVehicles()).isEqualTo(25L);
-        assertThat(result.getOutOfStockVehicles()).isEqualTo(10L);
+        assertThat(result.totalVehicles()).isEqualTo(100L);
+        assertThat(result.lowStockVehicles()).isEqualTo(25L);
+        assertThat(result.outOfStockVehicles()).isEqualTo(10L);
     }
 
     @Test

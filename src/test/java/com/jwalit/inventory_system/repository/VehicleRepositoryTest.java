@@ -234,18 +234,18 @@ class VehicleRepositoryTest {
 
         com.jwalit.inventory_system.dto.InventoryStatsDto stats = vehicleRepository.getInventoryStatistics();
 
-        assertThat(stats.getTotalVehicles()).isEqualTo(3L);
-        assertThat(stats.getLowStockVehicles()).isEqualTo(2L);  // quantity 3 and 0 are < 5
-        assertThat(stats.getOutOfStockVehicles()).isEqualTo(1L); // only quantity 0
+        assertThat(stats.totalVehicles()).isEqualTo(3L);
+        assertThat(stats.lowStockVehicles()).isEqualTo(2L);  // quantity 3 and 0 are < 5
+        assertThat(stats.outOfStockVehicles()).isEqualTo(1L); // only quantity 0
     }
 
     @Test
     void getInventoryStatistics_emptyRepository_returnsAllZeros() {
         com.jwalit.inventory_system.dto.InventoryStatsDto stats = vehicleRepository.getInventoryStatistics();
 
-        assertThat(stats.getTotalVehicles()).isEqualTo(0L);
-        assertThat(stats.getLowStockVehicles()).isEqualTo(0L);
-        assertThat(stats.getOutOfStockVehicles()).isEqualTo(0L);
+        assertThat(stats.totalVehicles()).isEqualTo(0L);
+        assertThat(stats.lowStockVehicles()).isEqualTo(0L);
+        assertThat(stats.outOfStockVehicles()).isEqualTo(0L);
     }
 
     @Test
@@ -257,9 +257,9 @@ class VehicleRepositoryTest {
 
         com.jwalit.inventory_system.dto.InventoryStatsDto stats = vehicleRepository.getInventoryStatistics();
 
-        assertThat(stats.getTotalVehicles()).isEqualTo(2L);
-        assertThat(stats.getLowStockVehicles()).isEqualTo(0L);
-        assertThat(stats.getOutOfStockVehicles()).isEqualTo(0L);
+        assertThat(stats.totalVehicles()).isEqualTo(2L);
+        assertThat(stats.lowStockVehicles()).isEqualTo(0L);
+        assertThat(stats.outOfStockVehicles()).isEqualTo(0L);
     }
 
     @Test
@@ -271,8 +271,8 @@ class VehicleRepositoryTest {
 
         com.jwalit.inventory_system.dto.InventoryStatsDto stats = vehicleRepository.getInventoryStatistics();
 
-        assertThat(stats.getTotalVehicles()).isEqualTo(2L);
-        assertThat(stats.getLowStockVehicles()).isEqualTo(2L);
-        assertThat(stats.getOutOfStockVehicles()).isEqualTo(2L);
+        assertThat(stats.totalVehicles()).isEqualTo(2L);
+        assertThat(stats.lowStockVehicles()).isEqualTo(2L);
+        assertThat(stats.outOfStockVehicles()).isEqualTo(2L);
     }
 }

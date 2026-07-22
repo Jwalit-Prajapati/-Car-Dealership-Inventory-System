@@ -105,7 +105,7 @@ class PurchaseControllerTest {
     @Test
     void purchaseVehicle_InvalidQuantity() throws Exception {
         manuallySetUserRole("USER");
-        requestDTO.setQuantity(0);
+        requestDTO = new PurchaseRequestDTO(requestDTO.vehicleId(), 0);
 
         mockMvc.perform(post("/api/purchases")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -127,7 +127,7 @@ class PurchaseControllerTest {
     @Test
     void purchaseVehicle_VehicleNotFound() throws Exception {
         manuallySetUserRole("USER");
-        requestDTO.setVehicleId(99L);
+        requestDTO = new PurchaseRequestDTO(99L, requestDTO.quantity());
         when(purchaseService.purchaseVehicle(any(PurchaseRequestDTO.class), anyString()))
                 .thenThrow(new VehicleNotFoundException("Vehicle not found"));
 

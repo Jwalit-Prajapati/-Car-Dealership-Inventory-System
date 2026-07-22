@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
-import com.jwalit.inventory_system.dto.VehiclePurchaseCountDto;
 
 @Repository
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {

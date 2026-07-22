@@ -38,11 +38,11 @@ public class VehicleService {
     public Page<VehicleResponseDTO> searchVehicles(VehicleSearchRequest request,
                                                     Pageable pageable) {
         Specification<Vehicle> spec = Specification
-                .where(VehicleSpecifications.hasMake(request.getMake()))
-                .and(VehicleSpecifications.hasModel(request.getModel()))
-                .and(VehicleSpecifications.hasCategory(request.getCategory()))
-                .and(VehicleSpecifications.hasMinimumPrice(request.getMinPrice()))
-                .and(VehicleSpecifications.hasMaximumPrice(request.getMaxPrice()));
+                .where(VehicleSpecifications.hasMake(request.make()))
+                .and(VehicleSpecifications.hasModel(request.model()))
+                .and(VehicleSpecifications.hasCategory(request.category()))
+                .and(VehicleSpecifications.hasMinimumPrice(request.minPrice()))
+                .and(VehicleSpecifications.hasMaximumPrice(request.maxPrice()));
 
         return vehicleRepository.findAll(spec, pageable)
                 .map(vehicleMapper::toResponseDto);

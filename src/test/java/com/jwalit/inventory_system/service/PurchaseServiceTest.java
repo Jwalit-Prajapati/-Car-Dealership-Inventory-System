@@ -103,7 +103,7 @@ class PurchaseServiceTest {
 
     @Test
     void testPurchaseVehicle_VehicleNotFound() {
-        requestDTO.setVehicleId(99L);
+        requestDTO = new PurchaseRequestDTO(99L, requestDTO.quantity());
         when(vehicleRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(VehicleNotFoundException.class, () ->
@@ -116,7 +116,7 @@ class PurchaseServiceTest {
 
     @Test
     void testPurchaseVehicle_InsufficientStock() {
-        requestDTO.setQuantity(6);
+        requestDTO = new PurchaseRequestDTO(requestDTO.vehicleId(), 6);
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
         when(userDetails.getUsername()).thenReturn("user@example.com");
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));

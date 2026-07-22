@@ -26,7 +26,10 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(properties = "spring.jpa.hibernate.ddl-auto=update")
+@SpringBootTest(properties = {
+        "spring.jpa.hibernate.ddl-auto=update",
+        "jwt.secret=FPGmY8nSFqyxEo2cB/WuEIWZlwKyPd+rMs34kFAQZiVblOMQSAz57YlxXERhNYzT"
+})
 @Testcontainers
 class PurchaseIntegrationTest {
 

@@ -1365,3 +1365,11 @@ I have addressed all the requested issues:
 4. **Service Responsibilities**: Extracted a new `StockService.java` to handle restock logic, removed the logic from `VehicleService`, and updated `VehicleController` to inject and use `StockService`.
 
 Awaiting your review and approval to commit these changes.
+
+## 2026-07-23T01:10:32+05:30
+
+**User Prompt:**
+commit the current state of the project to github
+
+**AI Response:**
+I have updated `PROMPTS.md` and committed the current state of the project to GitHub as requested. The commit encompasses recent refactoring including DTO modifications, converting responses to records, and adjusting validation rules.

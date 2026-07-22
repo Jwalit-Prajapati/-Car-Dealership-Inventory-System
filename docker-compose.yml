@@ -22,6 +22,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/inventory_db
       - SPRING_DATASOURCE_USERNAME=myuser
       - SPRING_DATASOURCE_PASSWORD=mypassword
+      - JWT_SECRET=tbBuiiqfAT/zMaxn6F2dGBQi58Jr/2du87efvsmBsHdW2lnSFYDsdg8FUe6tUB6h
     depends_on:
       - db
 

@@ -8,8 +8,8 @@ public class PriceRangeValidator implements ConstraintValidator<ValidPriceRange,
 
     @Override
     public boolean isValid(VehicleSearchRequest request, ConstraintValidatorContext context) {
-        if (request.getMinPrice() != null && request.getMaxPrice() != null) {
-            return request.getMinPrice().compareTo(request.getMaxPrice()) <= 0;
+        if (request.minPrice() != null && request.maxPrice() != null) {
+            return request.minPrice().compareTo(request.maxPrice()) <= 0;
         }
         return true;
     }

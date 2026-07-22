@@ -30,19 +30,19 @@ public class PurchaseService {
     @Transactional
     public PurchaseResponseDTO purchaseVehicle(PurchaseRequestDTO requestDTO,
                                                String email) {
-        Vehicle vehicle = vehicleRepository.findById(requestDTO.getVehicleId())
-                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + requestDTO.getVehicleId()));
+        Vehicle vehicle = vehicleRepository.findById(requestDTO.vehicleId())
+                .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + requestDTO.vehicleId()));
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        vehicle.reduceStock(requestDTO.getQuantity());
+        vehicle.reduceStock(requestDTO.quantity());
         vehicleRepository.save(vehicle);
 
         Purchase purchase = new Purchase();
         purchase.setUser(user);
         purchase.setVehicle(vehicle);
-        purchase.setQuantityPurchased(requestDTO.getQuantity());
+        purchase.setQuantityPurchased(requestDTO.quantity());
         purchase.setPurchasedPrice(vehicle.getPrice());
         purchase.setPurchaseDate(LocalDateTime.now());
 

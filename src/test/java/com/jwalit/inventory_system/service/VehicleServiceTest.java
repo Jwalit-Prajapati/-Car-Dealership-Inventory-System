@@ -138,12 +138,8 @@ class VehicleServiceTest {
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
 
-        VehicleSearchRequest req = new VehicleSearchRequest();
-        req.setMake("Toyota");
-        req.setModel("Camry");
-        req.setCategory("Sedan");
-        req.setMinPrice(new BigDecimal("10000"));
-        req.setMaxPrice(new BigDecimal("30000"));
+        VehicleSearchRequest req = new VehicleSearchRequest(
+                "Toyota", "Camry", "Sedan", new BigDecimal("10000"), new BigDecimal("30000"));
         vehicleService.searchVehicles(req, org.springframework.data.domain.PageRequest.of(0, 10));
 
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
@@ -154,7 +150,7 @@ class VehicleServiceTest {
         org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
-        vehicleService.searchVehicles(new VehicleSearchRequest(), org.springframework.data.domain.PageRequest.of(0, 10));
+        vehicleService.searchVehicles(new VehicleSearchRequest(null, null, null, null, null), org.springframework.data.domain.PageRequest.of(0, 10));
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
 
@@ -163,8 +159,7 @@ class VehicleServiceTest {
         org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
-        VehicleSearchRequest req = new VehicleSearchRequest();
-        req.setMinPrice(new BigDecimal("10000"));
+        VehicleSearchRequest req = new VehicleSearchRequest(null, null, null, new BigDecimal("10000"), null);
         vehicleService.searchVehicles(req, org.springframework.data.domain.PageRequest.of(0, 10));
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
@@ -174,8 +169,7 @@ class VehicleServiceTest {
         org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
-        VehicleSearchRequest req = new VehicleSearchRequest();
-        req.setMaxPrice(new BigDecimal("30000"));
+        VehicleSearchRequest req = new VehicleSearchRequest(null, null, null, null, new BigDecimal("30000"));
         vehicleService.searchVehicles(req, org.springframework.data.domain.PageRequest.of(0, 10));
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
@@ -185,9 +179,7 @@ class VehicleServiceTest {
         org.springframework.data.domain.Page<Vehicle> emptyPage = org.springframework.data.domain.Page.empty();
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
-        VehicleSearchRequest req = new VehicleSearchRequest();
-        req.setMinPrice(BigDecimal.ZERO);
-        req.setMaxPrice(new BigDecimal("9999999"));
+        VehicleSearchRequest req = new VehicleSearchRequest(null, null, null, BigDecimal.ZERO, new BigDecimal("9999999"));
         vehicleService.searchVehicles(req, org.springframework.data.domain.PageRequest.of(0, 10));
         verify(vehicleRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class));
     }
@@ -198,8 +190,7 @@ class VehicleServiceTest {
         when(vehicleRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), any(org.springframework.data.domain.Pageable.class)))
             .thenReturn(emptyPage);
 
-        VehicleSearchRequest req = new VehicleSearchRequest();
-        req.setMake("Unknown");
+        VehicleSearchRequest req = new VehicleSearchRequest("Unknown", null, null, null, null);
         org.springframework.data.domain.Page<VehicleResponseDTO> result = vehicleService.searchVehicles(req, org.springframework.data.domain.PageRequest.of(0, 10));
 
         assertThat(result).isNotNull();
