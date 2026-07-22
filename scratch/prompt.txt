@@ -1,0 +1,354 @@
+Timestamp: 2026-07-22T14:58:07+05:30
+
+User Prompt:
+Implement **Story 5: User Registration** using STRICT Test-Driven Development (TDD).
+
+Before making any changes:
+
+- Read and follow every rule defined in `AGENTS.md`.
+- Follow the TDD workflow exactly.
+- Follow the Testing Policy exactly.
+- Follow the Git Workflow exactly.
+- Maintain `PROMPTS.md` as required.
+- Do not implement functionality outside the scope of this story.
+
+# Story
+
+## Business Goal
+
+Allow new customers to register on the platform.
+
+## Technical Goal
+
+Implement a registration API that creates new users.
+
+Endpoint:
+
+POST /api/auth/register
+
+## Existing Components
+
+The previous story already provides:
+
+- User entity
+- Role enum
+- UserRepository
+- Flyway migration
+
+Reuse them instead of recreating them.
+
+---
+
+# Requirements
+
+Implement:
+
+- RegistrationRequest DTO
+- RegistrationResponse DTO (if needed)
+- AuthService
+- AuthController
+
+Password storage requirements:
+
+- Passwords must be BCrypt encoded before saving.
+- Do not store plain text passwords.
+
+Assigned role:
+
+- Every successful registration must assign the USER role.
+
+---
+
+# Validation Rules
+
+Use Jakarta Bean Validation (JSR-380).
+
+RegistrationRequest must validate:
+
+- firstName required
+- lastName required
+- email required
+- email must have valid format
+- password required
+- password minimum length: 8 characters
+
+Return:
+
+HTTP 400 Bad Request
+
+when validation fails.
+
+---
+
+# Edge Cases
+
+Handle duplicate email registration.
+
+If a user already exists with the same email:
+
+- registration must fail
+- return an appropriate error response
+- never create another user
+
+---
+
+# Testing Policy
+
+Follow AGENTS.md.
+
+For this story, the following test types are allowed.
+
+## Service Tests
+
+Use:
+
+- JUnit 5
+- Mockito
+
+Do NOT start Spring.
+
+Test AuthService in complete isolation.
+
+---
+
+## Controller Tests
+
+Use:
+
+- MockMvc standalone setup
+
+Do NOT use:
+
+- @SpringBootTest
+- @WebMvcTest
+- Full Spring Context
+
+Mock the service layer.
+
+---
+
+## DTO Validation Tests
+
+Create dedicated validation tests.
+
+Verify:
+
+- missing required fields
+- invalid email
+- password shorter than 8 characters
+
+---
+
+# Required Tests
+
+## AuthServiceTest
+
+Write FIRST.
+
+Tests:
+
+1.
+
+registerUser_success()
+
+Verify:
+
+- repository save invoked
+- password encoded
+- USER role assigned
+- returned object contains expected data
+
+2.
+
+registerUser_duplicateEmail()
+
+Verify:
+
+- existing email detected
+- exception thrown
+- repository save never called
+
+---
+
+## AuthControllerTest
+
+Write FIRST.
+
+Test:
+
+POST /api/auth/register
+
+Valid request
+
+Expect:
+
+- HTTP 201 Created (or the project's chosen success status)
+- correct JSON response
+
+Invalid request
+
+Examples:
+
+- invalid email
+- missing firstName
+- password too short
+
+Expect:
+
+HTTP 400 Bad Request
+
+---
+
+## RegistrationRequestValidationTest
+
+Verify Bean Validation:
+
+- missing fields
+- invalid email
+- password length
+
+---
+
+Initially every new test must fail.
+
+Do NOT write production code until the RED phase is complete.
+
+---
+
+# TDD Workflow
+
+## Phase 1 — RED
+
+Only:
+
+- RegistrationRequestValidationTest
+- AuthServiceTest
+- AuthControllerTest
+
+Run tests.
+
+Confirm they fail for the expected reasons.
+
+Stop.
+
+Explain:
+
+- why each test fails
+- what production code will be needed
+
+Wait for my approval.
+
+After approval, create the Git commit according to AGENTS.md.
+
+Commit:
+
+test(auth): add failing registration service and controller tests
+
+Stop.
+
+---
+
+## Phase 2 — GREEN
+
+Implement only the minimum code required to satisfy the failing tests.
+
+Tasks:
+
+- RegistrationRequest DTO
+- RegistrationResponse DTO (only if needed)
+- AuthService.register()
+- AuthController
+- BCrypt PasswordEncoder bean
+- duplicate email detection
+- USER role assignment
+
+Run all affected tests.
+
+All tests must pass.
+
+Do not refactor.
+
+Stop.
+
+Explain:
+
+- why each implementation change was necessary
+
+Wait for approval.
+
+Then create the commit:
+
+feat(auth): implement user registration logic
+
+Stop.
+
+---
+
+## Phase 3 — REFACTOR
+
+Improve the implementation without changing behaviour.
+
+Possible refactorings:
+
+- Introduce MapStruct mapping between RegistrationRequest and User.
+- Improve separation of mapping responsibilities.
+- Improve duplicate email handling (dedicated validator or cleaner exception handling).
+- Remove duplication.
+- Improve readability.
+
+Keep every test passing.
+
+Stop.
+
+Explain every refactoring performed.
+
+Wait for approval.
+
+Then create:
+
+refactor(auth): introduce mapstruct for registration mapping
+
+---
+
+# Definition of Done
+
+The story is complete only if:
+
+✓ POST /api/auth/register works
+
+✓ RegistrationRequest validates input
+
+✓ Invalid payload returns HTTP 400
+
+✓ Duplicate emails are rejected
+
+✓ Passwords are BCrypt encoded
+
+✓ USER role is automatically assigned
+
+✓ Service tests pass
+
+✓ Controller tests pass
+
+✓ DTO validation tests pass
+
+✓ No unnecessary Spring context is started
+
+✓ All phases strictly follow RED → GREEN → REFACTOR
+
+✓ Commits are created only after my explicit approval
+
+---
+
+# General Rules
+
+- Never skip TDD phases.
+- Never implement authentication or JWT yet.
+- Never implement login.
+- Never introduce Spring Security configuration beyond the PasswordEncoder bean needed for hashing.
+- Keep each phase as small as possible.
+- Follow clean architecture and separation of concerns.
+- Explain every design decision before proceeding to the next phase.
+
+AI Response:
+I will implement this using TDD following the RED -> GREEN -> REFACTOR cycle. I have started Phase 1 - RED.

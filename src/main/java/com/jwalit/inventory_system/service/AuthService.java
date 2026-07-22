@@ -6,6 +6,8 @@ import com.jwalit.inventory_system.entity.User;
 import com.jwalit.inventory_system.repository.UserRepository;
 import com.jwalit.inventory_system.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.jwalit.inventory_system.dto.LoginRequest;
+import com.jwalit.inventory_system.dto.LoginResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,10 @@ public class AuthService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        return null;
     }
 
     @Transactional

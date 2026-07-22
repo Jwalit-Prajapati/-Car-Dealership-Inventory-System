@@ -1,6 +1,8 @@
 package com.jwalit.inventory_system.controller;
 
 
+import com.jwalit.inventory_system.dto.LoginRequest;
+import com.jwalit.inventory_system.dto.LoginResponse;
 import com.jwalit.inventory_system.dto.RegistrationRequest;
 import com.jwalit.inventory_system.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +18,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -119,6 +123,57 @@ class AuthControllerTest {
             .when(authService).register(any(RegistrationRequest.class));
 
         mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void login_validRequest_returns200AndToken() throws Exception {
+        String json = """
+        {
+            "email": "user@example.com",
+            "password": "password123"
+        }
+        """;
+        
+        org.mockito.BDDMockito.given(authService.login(any(LoginRequest.class))).willReturn(new LoginResponse("fake-jwt-token"));
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("fake-jwt-token"));
+    }
+
+    @Test
+    void login_invalidCredentials_returns401() throws Exception {
+        String json = """
+        {
+            "email": "user@example.com",
+            "password": "wrongpassword"
+        }
+        """;
+
+        org.mockito.BDDMockito.given(authService.login(any(LoginRequest.class)))
+            .willThrow(new org.springframework.security.authentication.BadCredentialsException("Bad credentials"));
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void login_blankFields_returns400() throws Exception {
+        String json = """
+        {
+            "email": "",
+            "password": ""
+        }
+        """;
+
+        mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isBadRequest());

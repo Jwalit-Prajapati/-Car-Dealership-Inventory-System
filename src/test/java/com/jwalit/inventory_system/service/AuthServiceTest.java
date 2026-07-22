@@ -1,5 +1,7 @@
 package com.jwalit.inventory_system.service;
 
+import com.jwalit.inventory_system.dto.LoginRequest;
+import com.jwalit.inventory_system.dto.LoginResponse;
 import com.jwalit.inventory_system.dto.RegistrationRequest;
 import com.jwalit.inventory_system.entity.Role;
 import com.jwalit.inventory_system.entity.User;
@@ -84,5 +86,28 @@ class AuthServiceTest {
                 .hasMessageContaining("Email already in use");
 
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void login_validCredentials_returnsJwt() {
+        LoginRequest request = new LoginRequest("user@example.com", "password123");
+        // For RED phase, just call the method that returns null and assert it is not blank
+        LoginResponse response = authService.login(request);
+        assertThat(response).isNotNull();
+        assertThat(response.token()).isNotBlank();
+    }
+
+    @Test
+    void login_wrongPassword_throwsException() {
+        LoginRequest request = new LoginRequest("user@example.com", "wrong");
+        assertThatThrownBy(() -> authService.login(request))
+            .isInstanceOf(org.springframework.security.core.AuthenticationException.class);
+    }
+
+    @Test
+    void login_userNotFound_throwsException() {
+        LoginRequest request = new LoginRequest("unknown@example.com", "password123");
+        assertThatThrownBy(() -> authService.login(request))
+            .isInstanceOf(org.springframework.security.core.AuthenticationException.class);
     }
 }

@@ -114,5 +114,5 @@ REFACTOR
 Never create commits automatically.
 
 Only commit after I explicitly approve the current phase or instruct you to proceed.
-Follow the Git Commit Message policy above.
+Follow the Git Commit Message policy above. and perform a `git push` after each commit.
 

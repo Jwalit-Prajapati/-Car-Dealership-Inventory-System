@@ -1,5 +1,7 @@
 package com.jwalit.inventory_system.controller;
 
+import com.jwalit.inventory_system.dto.LoginRequest;
+import com.jwalit.inventory_system.dto.LoginResponse;
 import com.jwalit.inventory_system.dto.RegistrationRequest;
 import com.jwalit.inventory_system.service.AuthService;
 import jakarta.validation.Valid;
@@ -15,6 +17,11 @@ public class AuthController {
 
     public AuthController(AuthService authService) {
         this.authService = authService;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping("/register")
