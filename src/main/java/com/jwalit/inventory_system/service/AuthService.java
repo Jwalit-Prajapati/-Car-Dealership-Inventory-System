@@ -10,10 +10,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.jwalit.inventory_system.dto.LoginRequest;
 import com.jwalit.inventory_system.dto.LoginResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -21,14 +23,6 @@ public class AuthService {
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper, AuthenticationManager authenticationManager, JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-    }
 
     public LoginResponse login(LoginRequest request) {
         authenticationManager.authenticate(
