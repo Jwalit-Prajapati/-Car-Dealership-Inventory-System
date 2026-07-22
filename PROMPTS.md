@@ -185,3 +185,20 @@ I have told you to commit after each phase of Red-Green-Refactor and commit it o
 
 **AI Response:**
 Pushed the RED and GREEN phases to GitHub. Refactored the GlobalExceptionHandler to use HttpStatus.value() instead of hardcoded numbers to ensure better maintainability and readability. Verified that all tests pass, logged the REFACTOR phase, committed it, and pushed it to GitHub.
+
+## 2026-07-22T11:40:33+05:30
+
+**User Prompt:**
+# Story 5 – Health Check Controller (Strict TDD with Git Commits)
+... [Truncated for brevity] ...
+
+**AI Response:**
+Created HealthControllerTest.java with a failing standalone MockMvc test for the health endpoint. The test fails at compile time because HealthController doesn't exist yet, satisfying the RED phase requirements.
+
+## 2026-07-22T11:41:34+05:30
+
+**User Prompt:**
+proceed for next phase
+
+**AI Response:**
+Committed the RED phase. Proceeding to GREEN phase.
