@@ -913,3 +913,17 @@ commit this refactor phase
 
 ****AI Response:****
 I will update PROMPTS.md, commit the REFACTOR phase, and conclude the story.
+## Interaction
+**Timestamp:** 2026-07-22T16:38:15+05:30
+
+**User Prompt:**
+Implement the following story using strict Test-Driven Development (TDD) while following all rules defined in AGENTS.md, including the testing policy, commit policy, and AI usage disclosure.
+
+# Story 10: Update and Delete Vehicles (Admin Only)
+... [Full prompt omitted for brevity] ...
+Wait for approval between RED, GREEN, and REFACTOR phases.
+
+**AI Response:**
+Successfully completed Phase 1 (RED) by writing failing tests for the Controller and Service, ensuring the tests fail for the expected reasons, and committing the code after user approval. 
+Successfully completed Phase 2 (GREEN) by implementing the logic to satisfy the failing tests. I updated VehicleServiceImpl to support updating and deleting vehicles and created a specific VehicleNotFoundException that extends ResourceNotFoundException.
+Successfully completed Phase 3 (REFACTOR) by optimizing the mapping in VehicleServiceImpl using MapStruct and verifying the behavior in the updated tests.
