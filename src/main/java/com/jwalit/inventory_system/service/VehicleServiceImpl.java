@@ -51,11 +51,7 @@ public class VehicleServiceImpl implements VehicleService {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found with id: " + id));
         
-        vehicle.setMake(vehicleRequestDTO.getMake());
-        vehicle.setModel(vehicleRequestDTO.getModel());
-        vehicle.setCategory(vehicleRequestDTO.getCategory());
-        vehicle.setPrice(vehicleRequestDTO.getPrice());
-        vehicle.setQuantity(vehicleRequestDTO.getQuantity());
+        vehicleMapper.updateEntityFromDto(vehicleRequestDTO, vehicle);
         
         return vehicleRepository.save(vehicle);
     }

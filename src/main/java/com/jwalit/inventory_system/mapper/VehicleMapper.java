@@ -10,4 +10,7 @@ import org.mapstruct.MappingConstants;
 public interface VehicleMapper {
     @Mapping(target = "id", ignore = true)
     Vehicle toEntity(VehicleRequestDTO dto);
+
+    @Mapping(target = "id", ignore = true)
+    void updateEntityFromDto(VehicleRequestDTO dto, @org.mapstruct.MappingTarget Vehicle vehicle);
 }

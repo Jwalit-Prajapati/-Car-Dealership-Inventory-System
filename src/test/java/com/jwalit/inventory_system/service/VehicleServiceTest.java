@@ -89,6 +89,7 @@ class VehicleServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getMake()).isEqualTo(request.getMake());
         verify(vehicleRepository).findById(1L);
+        verify(vehicleMapper).updateEntityFromDto(request, existingVehicle);
         verify(vehicleRepository).save(any(Vehicle.class));
     }
 
