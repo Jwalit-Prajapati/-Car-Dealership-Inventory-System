@@ -123,4 +123,60 @@ class VehicleServiceTest {
         assertThatThrownBy(() -> vehicleService.delete(999L))
             .isInstanceOf(com.jwalit.inventory_system.exception.VehicleNotFoundException.class);
     }
+
+    // ── Restock tests ──────────────────────────────────────────────────────────
+
+    @Test
+    void restock_validQuantity_incrementsAndSavesVehicle() {
+        Vehicle existing = new Vehicle();
+        existing.setId(1L);
+        existing.setQuantity(5);
+
+        Vehicle saved = new Vehicle();
+        saved.setId(1L);
+        saved.setQuantity(15);
+
+        when(vehicleRepository.findById(1L)).thenReturn(java.util.Optional.of(existing));
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(saved);
+
+        vehicleService.restock(1L, 10);
+
+        assertThat(existing.getQuantity()).isEqualTo(15);
+        verify(vehicleRepository).save(existing);
+    }
+
+    @Test
+    void restock_largeQuantity_incrementsSafely() {
+        Vehicle existing = new Vehicle();
+        existing.setId(2L);
+        existing.setQuantity(Integer.MAX_VALUE - 1);
+
+        when(vehicleRepository.findById(2L)).thenReturn(java.util.Optional.of(existing));
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(existing);
+
+        vehicleService.restock(2L, 1);
+
+        assertThat(existing.getQuantity()).isEqualTo(Integer.MAX_VALUE);
+        verify(vehicleRepository).save(existing);
+    }
+
+    @Test
+    void restock_vehicleNotFound_throwsVehicleNotFoundException() {
+        when(vehicleRepository.findById(999L)).thenReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> vehicleService.restock(999L, 5))
+            .isInstanceOf(com.jwalit.inventory_system.exception.VehicleNotFoundException.class);
+    }
+
+    @Test
+    void restock_zeroQuantity_throwsIllegalArgumentException() {
+        assertThatThrownBy(() -> vehicleService.restock(1L, 0))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void restock_negativeQuantity_throwsIllegalArgumentException() {
+        assertThatThrownBy(() -> vehicleService.restock(1L, -3))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 }

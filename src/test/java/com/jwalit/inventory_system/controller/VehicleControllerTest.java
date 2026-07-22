@@ -261,4 +261,90 @@ class VehicleControllerTest {
                 .andExpect(status().isNotFound());
         SecurityContextHolder.clearContext();
     }
+
+    // ── Restock controller tests ───────────────────────────────────────────────
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void restock_asAdmin_validRequest_returns200() throws Exception {
+        manuallySetUserRole("ADMIN");
+
+        com.jwalit.inventory_system.dto.RestockRequest request =
+                new com.jwalit.inventory_system.dto.RestockRequest(10);
+
+        org.mockito.Mockito.doNothing().when(vehicleService).restock(any(Long.class), any(Integer.class));
+
+        mockMvc.perform(post("/api/vehicles/1/restock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Vehicle restocked successfully"));
+
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void restock_asUser_returns403() throws Exception {
+        manuallySetUserRole("USER");
+
+        com.jwalit.inventory_system.dto.RestockRequest request =
+                new com.jwalit.inventory_system.dto.RestockRequest(10);
+
+        mockMvc.perform(post("/api/vehicles/1/restock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void restock_anonymous_returns401() throws Exception {
+        SecurityContextHolder.clearContext();
+
+        com.jwalit.inventory_system.dto.RestockRequest request =
+                new com.jwalit.inventory_system.dto.RestockRequest(10);
+
+        mockMvc.perform(post("/api/vehicles/1/restock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void restock_zeroQuantity_returns400() throws Exception {
+        manuallySetUserRole("ADMIN");
+
+        com.jwalit.inventory_system.dto.RestockRequest request =
+                new com.jwalit.inventory_system.dto.RestockRequest(0);
+
+        mockMvc.perform(post("/api/vehicles/1/restock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void restock_vehicleNotFound_returns404() throws Exception {
+        manuallySetUserRole("ADMIN");
+
+        com.jwalit.inventory_system.dto.RestockRequest request =
+                new com.jwalit.inventory_system.dto.RestockRequest(5);
+
+        org.mockito.Mockito.doThrow(new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found"))
+                .when(vehicleService).restock(any(Long.class), any(Integer.class));
+
+        mockMvc.perform(post("/api/vehicles/999/restock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+
+        SecurityContextHolder.clearContext();
+    }
 }
+

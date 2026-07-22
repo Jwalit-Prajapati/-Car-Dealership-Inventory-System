@@ -1030,3 +1030,26 @@ go with option A
 
 ****AI Response:****
 Executed Option A (Squash): stashed unstaged changes, ran `git rebase -i 2bda868` with a Python-based sequence editor that marked `cd26721` and `b345e24` as `squash` targets under `eef92c5`. The rebase successfully completed, squashing all three commits into a single clean commit (`99f7bea`). Removed all temporary helper files and pushed the rewritten history to GitHub with `git push --force-with-lease origin main`. The old commits no longer exist in the repository history.
+
+## 2026-07-22T18:02:31+05:30
+
+****User Prompt:****
+Story 13: Restock Vehicle Inventory (Admin Only) — Phase 1 (RED).
+
+Implement the TDD RED phase for POST /api/vehicles/{id}/restock:
+- Security authorization tests (ADMIN allowed, USER 403, anonymous 401)
+- Controller tests (valid request 200, zero quantity 400, vehicle not found 404, USER 403, anonymous 401)
+- Service tests (quantity increments correctly, repository save is invoked, vehicle not found throws VehicleNotFoundException, quantity <= 0 throws IllegalArgumentException, large quantity increments safely)
+
+Do NOT implement production code. Run tests and confirm they fail for the correct reason.
+
+****AI Response:****
+Phase 1 (RED) complete. Created the following test artifacts — no production logic added:
+
+1. `RestockRequest.java` (DTO only — required for tests to compile, no service logic).
+2. Appended 5 restock service tests to `VehicleServiceTest.java`.
+3. Appended 5 restock controller tests to `VehicleControllerTest.java`.
+4. Created `VehicleRestockSecurityTest.java` with 3 dedicated security authorization tests.
+
+`mvn test` failed with **8 compilation errors** — all `cannot find symbol: method restock(...)` — confirming tests are RED for the correct reason (missing production implementation). Awaiting approval to commit and proceed to Phase 2 (GREEN).
+
