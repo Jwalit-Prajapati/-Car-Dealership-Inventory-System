@@ -177,3 +177,11 @@ Created GlobalExceptionHandlerTest.java with failing mockmvc tests for global ex
 
 **AI Response:**
 Implemented GlobalExceptionHandler to satisfy the tests. Verified all tests passed using 'mvn test' and committed the changes. Stopping after GREEN phase and waiting for approval to proceed to the REFACTOR phase.
+
+## 2026-07-22T11:27:15+05:30
+
+**User Prompt:**
+I have told you to commit after each phase of Red-Green-Refactor and commit it on git hub
+
+**AI Response:**
+Pushed the RED and GREEN phases to GitHub. Refactored the GlobalExceptionHandler to use HttpStatus.value() instead of hardcoded numbers to ensure better maintainability and readability. Verified that all tests pass, logged the REFACTOR phase, committed it, and pushed it to GitHub.
