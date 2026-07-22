@@ -36,14 +36,13 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public Page<Vehicle> searchVehicles(String make, String category, Pageable pageable) {
-        if (make != null && !make.trim().isEmpty() && category != null && !category.trim().isEmpty()) {
-            return vehicleRepository.findByMakeContainingIgnoreCaseAndCategoryIgnoreCase(make.trim(), category.trim(), pageable);
-        } else if (make != null && !make.trim().isEmpty()) {
-            return vehicleRepository.findByMakeContainingIgnoreCase(make.trim(), pageable);
-        } else if (category != null && !category.trim().isEmpty()) {
-            return vehicleRepository.findByCategoryIgnoreCase(category.trim(), pageable);
-        } else {
-            return vehicleRepository.findAll(pageable);
+        org.springframework.data.jpa.domain.Specification<Vehicle> spec = (root, query, cb) -> cb.conjunction();
+        if (make != null && !make.trim().isEmpty()) {
+            spec = spec.and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasMake(make));
         }
+        if (category != null && !category.trim().isEmpty()) {
+            spec = spec.and(com.jwalit.inventory_system.repository.VehicleSpecifications.hasCategory(category));
+        }
+        return vehicleRepository.findAll(spec, pageable);
     }
 }

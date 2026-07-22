@@ -92,7 +92,7 @@ class VehicleRepositoryTest {
         vehicleRepository.save(v1);
         vehicleRepository.save(v2);
 
-        Page<Vehicle> result = vehicleRepository.findByMakeContainingIgnoreCase("toy", PageRequest.of(0, 10));
+        Page<Vehicle> result = vehicleRepository.findAll(VehicleSpecifications.hasMake("toy"), PageRequest.of(0, 10));
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getMake()).isEqualTo("Toyota");
     }
@@ -102,7 +102,7 @@ class VehicleRepositoryTest {
         Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("1000")); v1.setQuantity(1);
         vehicleRepository.save(v1);
 
-        Page<Vehicle> result = vehicleRepository.findByCategoryIgnoreCase("sedan", PageRequest.of(0, 10));
+        Page<Vehicle> result = vehicleRepository.findAll(VehicleSpecifications.hasCategory("sedan"), PageRequest.of(0, 10));
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getCategory()).isEqualTo("Sedan");
     }
@@ -112,7 +112,10 @@ class VehicleRepositoryTest {
         Vehicle v1 = new Vehicle(); v1.setMake("Toyota"); v1.setModel("Camry"); v1.setCategory("Sedan"); v1.setPrice(new BigDecimal("1000")); v1.setQuantity(1);
         vehicleRepository.save(v1);
 
-        Page<Vehicle> result = vehicleRepository.findByMakeContainingIgnoreCaseAndCategoryIgnoreCase("toy", "sedan", PageRequest.of(0, 10));
+        Page<Vehicle> result = vehicleRepository.findAll(
+                org.springframework.data.jpa.domain.Specification.where(VehicleSpecifications.hasMake("toy"))
+                        .and(VehicleSpecifications.hasCategory("sedan")),
+                PageRequest.of(0, 10));
         assertThat(result.getContent()).hasSize(1);
     }
 }
