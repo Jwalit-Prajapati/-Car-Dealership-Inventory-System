@@ -12,6 +12,8 @@ class JwtServiceTest {
     @BeforeEach
     void setUp() {
         jwtService = new JwtService();
+        org.springframework.test.util.ReflectionTestUtils.setField(jwtService, "secretKey", "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970");
+        org.springframework.test.util.ReflectionTestUtils.setField(jwtService, "jwtExpiration", 86400000L);
     }
 
     @Test
@@ -40,9 +42,18 @@ class JwtServiceTest {
     
     @Test
     void isTokenValid_expiredToken_returnsFalse() {
-        // Will implement the expired test in GREEN phase when implementing JwtService
-        // For now, any invalid token returns false in stub, but we need to ensure test will fail until we actually implement it.
-        // Actually since we don't have time parameterization yet, we can leave this for GREEN phase or put a placeholder that fails.
-        // Let's assert true for now but expect false? No, we will revisit.
+        // Since we cannot easily inject time, let's create a JwtService with 0 ms expiration using reflection, 
+        // or just wait for it to expire if we set it to 1ms.
+        org.springframework.test.util.ReflectionTestUtils.setField(jwtService, "jwtExpiration", 1L);
+        org.springframework.test.util.ReflectionTestUtils.setField(jwtService, "secretKey", "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970");
+        String token = jwtService.generateToken("user@example.com");
+        
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        assertThat(jwtService.isTokenValid(token)).isFalse();
     }
 }

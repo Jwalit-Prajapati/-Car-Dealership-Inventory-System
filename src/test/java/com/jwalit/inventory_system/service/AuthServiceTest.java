@@ -14,6 +14,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -36,6 +38,12 @@ class AuthServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private JwtService jwtService;
 
     @InjectMocks
     private AuthService authService;
@@ -91,15 +99,26 @@ class AuthServiceTest {
     @Test
     void login_validCredentials_returnsJwt() {
         LoginRequest request = new LoginRequest("user@example.com", "password123");
-        // For RED phase, just call the method that returns null and assert it is not blank
+        User user = new User();
+        user.setEmail("user@example.com");
+
+        given(userRepository.findByEmail(request.email())).willReturn(Optional.of(user));
+        given(jwtService.generateToken("user@example.com")).willReturn("jwt-token");
+
         LoginResponse response = authService.login(request);
+        
         assertThat(response).isNotNull();
-        assertThat(response.token()).isNotBlank();
+        assertThat(response.token()).isEqualTo("jwt-token");
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 
     @Test
     void login_wrongPassword_throwsException() {
         LoginRequest request = new LoginRequest("user@example.com", "wrong");
+        
+        given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+            .willThrow(new org.springframework.security.authentication.BadCredentialsException("Bad credentials"));
+
         assertThatThrownBy(() -> authService.login(request))
             .isInstanceOf(org.springframework.security.core.AuthenticationException.class);
     }
@@ -107,6 +126,9 @@ class AuthServiceTest {
     @Test
     void login_userNotFound_throwsException() {
         LoginRequest request = new LoginRequest("unknown@example.com", "password123");
+        
+        given(userRepository.findByEmail(request.email())).willReturn(Optional.empty());
+
         assertThatThrownBy(() -> authService.login(request))
             .isInstanceOf(org.springframework.security.core.AuthenticationException.class);
     }
