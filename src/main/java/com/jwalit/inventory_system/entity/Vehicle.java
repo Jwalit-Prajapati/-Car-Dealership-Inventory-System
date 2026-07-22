@@ -4,13 +4,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "vehicles")
+@Table(name = "vehicles", indexes = {
+    @Index(name = "idx_vehicle_make", columnList = "make"),
+    @Index(name = "idx_vehicle_category", columnList = "category")
+})
 public class Vehicle {
 
     @Id
