@@ -170,4 +170,94 @@ class VehicleControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateVehicle_asAdmin_returns200() throws Exception {
+        manuallySetUserRole("ADMIN");
+        VehicleRequestDTO request = createValidRequest();
+        Vehicle mockVehicle = new Vehicle();
+        mockVehicle.setId(1L);
+
+        when(vehicleService.update(any(Long.class), any(VehicleRequestDTO.class))).thenReturn(mockVehicle);
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/vehicles/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateVehicle_invalidPayload_returns400() throws Exception {
+        manuallySetUserRole("ADMIN");
+        VehicleRequestDTO request = new VehicleRequestDTO("", "", "", new BigDecimal("-1"), -5);
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/vehicles/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void updateVehicle_asUser_returns403() throws Exception {
+        manuallySetUserRole("USER");
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/vehicles/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createValidRequest())))
+                .andExpect(status().isForbidden());
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateVehicle_notFound_returns404() throws Exception {
+        manuallySetUserRole("ADMIN");
+        VehicleRequestDTO request = createValidRequest();
+
+        when(vehicleService.update(any(Long.class), any(VehicleRequestDTO.class))).thenThrow(new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found"));
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/vehicles/999")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deleteVehicle_asAdmin_returns204() throws Exception {
+        manuallySetUserRole("ADMIN");
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/vehicles/1"))
+                .andExpect(status().isNoContent());
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void deleteVehicle_asUser_returns403() throws Exception {
+        manuallySetUserRole("USER");
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/vehicles/1"))
+                .andExpect(status().isForbidden());
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deleteVehicle_notFound_returns404() throws Exception {
+        manuallySetUserRole("ADMIN");
+
+        org.mockito.Mockito.doThrow(new com.jwalit.inventory_system.exception.VehicleNotFoundException("Vehicle not found")).when(vehicleService).delete(any(Long.class));
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/vehicles/999"))
+                .andExpect(status().isNotFound());
+        SecurityContextHolder.clearContext();
+    }
 }

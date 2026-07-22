@@ -51,4 +51,17 @@ public class VehicleController {
             Pageable pageable) {
         return ResponseEntity.ok(vehicleService.searchVehicles(make, category, pageable));
     }
+
+    @org.springframework.web.bind.annotation.PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Vehicle> updateVehicle(@org.springframework.web.bind.annotation.PathVariable Long id, @Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
+        return ResponseEntity.ok(vehicleService.update(id, vehicleRequestDTO));
+    }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteVehicle(@org.springframework.web.bind.annotation.PathVariable Long id) {
+        vehicleService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

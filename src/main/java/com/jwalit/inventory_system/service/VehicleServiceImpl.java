@@ -45,4 +45,13 @@ public class VehicleServiceImpl implements VehicleService {
         }
         return vehicleRepository.findAll(spec, pageable);
     }
+
+    @Override
+    public Vehicle update(Long id, VehicleRequestDTO vehicleRequestDTO) {
+        return null;
+    }
+
+    @Override
+    public void delete(Long id) {
+    }
 }

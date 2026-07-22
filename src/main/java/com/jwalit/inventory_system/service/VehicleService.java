@@ -10,4 +10,6 @@ public interface VehicleService {
     Vehicle create(VehicleRequestDTO vehicleRequestDTO);
     Page<Vehicle> getVehicles(Pageable pageable);
     Page<Vehicle> searchVehicles(String make, String category, Pageable pageable);
+    Vehicle update(Long id, VehicleRequestDTO vehicleRequestDTO);
+    void delete(Long id);
 }

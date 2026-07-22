@@ -68,4 +68,57 @@ class VehicleServiceTest {
         assertThatThrownBy(() -> vehicleService.create(null))
             .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void update_validRequest_updatesAndReturnsVehicle() {
+        VehicleRequestDTO request = createValidRequest();
+        Vehicle existingVehicle = new Vehicle();
+        existingVehicle.setId(1L);
+        existingVehicle.setMake("Old Make");
+        
+        when(vehicleRepository.findById(1L)).thenReturn(java.util.Optional.of(existingVehicle));
+        
+        Vehicle updatedVehicle = new Vehicle();
+        updatedVehicle.setId(1L);
+        updatedVehicle.setMake(request.getMake());
+        
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(updatedVehicle);
+        
+        Vehicle result = vehicleService.update(1L, request);
+        
+        assertThat(result).isNotNull();
+        assertThat(result.getMake()).isEqualTo(request.getMake());
+        verify(vehicleRepository).findById(1L);
+        verify(vehicleRepository).save(any(Vehicle.class));
+    }
+
+    @Test
+    void update_vehicleNotFound_throwsException() {
+        VehicleRequestDTO request = createValidRequest();
+        when(vehicleRepository.findById(999L)).thenReturn(java.util.Optional.empty());
+        
+        assertThatThrownBy(() -> vehicleService.update(999L, request))
+            .isInstanceOf(com.jwalit.inventory_system.exception.VehicleNotFoundException.class);
+    }
+
+    @Test
+    void delete_existingVehicle_deletesVehicle() {
+        Vehicle existingVehicle = new Vehicle();
+        existingVehicle.setId(1L);
+        
+        when(vehicleRepository.findById(1L)).thenReturn(java.util.Optional.of(existingVehicle));
+        
+        vehicleService.delete(1L);
+        
+        verify(vehicleRepository).findById(1L);
+        verify(vehicleRepository).delete(existingVehicle);
+    }
+
+    @Test
+    void delete_vehicleNotFound_throwsException() {
+        when(vehicleRepository.findById(999L)).thenReturn(java.util.Optional.empty());
+        
+        assertThatThrownBy(() -> vehicleService.delete(999L))
+            .isInstanceOf(com.jwalit.inventory_system.exception.VehicleNotFoundException.class);
+    }
 }
