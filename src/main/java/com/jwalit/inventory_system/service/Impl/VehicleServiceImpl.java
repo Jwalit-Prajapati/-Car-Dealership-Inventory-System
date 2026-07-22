@@ -1,9 +1,10 @@
-package com.jwalit.inventory_system.service;
+package com.jwalit.inventory_system.service.Impl;
 
 import com.jwalit.inventory_system.dto.VehicleRequestDTO;
 import com.jwalit.inventory_system.entity.Vehicle;
 import com.jwalit.inventory_system.mapper.VehicleMapper;
 import com.jwalit.inventory_system.repository.VehicleRepository;
+import com.jwalit.inventory_system.service.VehicleService;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
