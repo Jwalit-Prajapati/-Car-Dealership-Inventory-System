@@ -34,3 +34,11 @@ Whenever we have a development-related conversation:
 - Keep entries in chronological order.
 
 If `PROMPTS.md` does not exist, create it.
+
+## Originality Policy
+
+- Never copy or closely reproduce code from GitHub repositories, Stack Overflow, blogs, tutorials, or other public sources.
+- Use official language/framework documentation only as a reference for APIs and behavior.
+- Generate all production and test code from first principles based on the requirements.
+- If a generated solution appears similar to an external source, rewrite it from scratch before presenting it.
+- Prefer simple, idiomatic, and original implementations over reproducing common examples.
