@@ -1,6 +1,6 @@
 package com.jwalit.inventory_system.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.jwalit.inventory_system.dto.RegistrationRequest;
 import com.jwalit.inventory_system.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ class AuthControllerTest {
     @InjectMocks
     private AuthController authController;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+
 
     @BeforeEach
     void setUp() {
@@ -38,54 +38,89 @@ class AuthControllerTest {
 
     @Test
     void registerUser_validRequest_returns201() throws Exception {
-        RegistrationRequest request = new RegistrationRequest("John", "Doe", "john@example.com", "password123");
+        String json = """
+        {
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john@example.com",
+            "password": "password123"
+        }
+        """;
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(json))
                 .andExpect(status().isCreated());
     }
 
     @Test
     void registerUser_invalidEmail_returns400() throws Exception {
-        RegistrationRequest request = new RegistrationRequest("John", "Doe", "invalid", "password123");
+        String json = """
+        {
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "invalid",
+            "password": "password123"
+        }
+        """;
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(json))
                 .andExpect(status().isBadRequest()); // Note: Since this is standalone setup without ControllerAdvice, it may return 400 if validation is triggered via Valid, we'll implement this properly in GREEN.
     }
     
     @Test
     void registerUser_missingFirstName_returns400() throws Exception {
-        RegistrationRequest request = new RegistrationRequest(null, "Doe", "john@example.com", "password123");
+        String json = """
+        {
+            "firstName": null,
+            "lastName": "Doe",
+            "email": "john@example.com",
+            "password": "password123"
+        }
+        """;
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(json))
                 .andExpect(status().isBadRequest());
     }
     
     @Test
     void registerUser_passwordTooShort_returns400() throws Exception {
-        RegistrationRequest request = new RegistrationRequest("John", "Doe", "john@example.com", "short");
+        String json = """
+        {
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john@example.com",
+            "password": "short"
+        }
+        """;
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(json))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void registerUser_duplicateEmail_returns400() throws Exception {
-        RegistrationRequest request = new RegistrationRequest("John", "Doe", "john@example.com", "password123");
+        String json = """
+        {
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john@example.com",
+            "password": "password123"
+        }
+        """;
         
         doThrow(new IllegalArgumentException("Email already in use"))
             .when(authService).register(any(RegistrationRequest.class));
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(json))
                 .andExpect(status().isBadRequest());
     }
 }
