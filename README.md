@@ -1,16 +1,19 @@
 # Car Dealership Inventory System
 
 ## Overview
-A comprehensive RESTful API built with Spring Boot for managing a car dealership's inventory. The system handles user management, role-based authentication, vehicle inventory tracking, and purchase processing. It is designed with a robust layered architecture, utilizing modern Java practices and containerized dependencies.
+A full-stack car dealership inventory management system: a RESTful API built with Spring Boot, paired with a React single-page app frontend. The system handles user management, role-based authentication, vehicle inventory tracking (with photo uploads), purchase processing, and an admin dashboard with inventory/sales analytics. The backend follows a robust layered architecture using modern Java practices, and the whole stack (Postgres, backend, frontend) is containerized for one-command local startup.
 
 ## Key Features
-- **User Authentication & Authorization**: Secure API endpoints using Spring Security and JSON Web Tokens (JWT).
+- **User Authentication & Authorization**: Secure API endpoints using Spring Security and JSON Web Tokens (JWT), with role-aware routing on the frontend (`ADMIN` vs `USER`).
 - **User Management**: Manage users and their roles, storing comprehensive profiles including addresses and driving license details.
-- **Vehicle Inventory**: Track vehicle stock by make, model, category, and price. Includes atomic operations to add and reduce stock, preventing negative inventory.
-- **Purchase Processing**: Record transactions linking users to vehicle purchases, tracking historical pricing and quantities.
-- **Dashboard Analytics**: Exposes high-level metrics and statistics via dedicated dashboard endpoints.
+- **Vehicle Inventory**: Track vehicle stock by make, model, category, and price, with photo uploads. Includes atomic operations to add and reduce stock, preventing negative inventory.
+- **Search & Browse**: Public vehicle dashboard with filtering (make, model, category, min/max price) and pagination.
+- **Purchase Processing**: Record transactions linking users to vehicle purchases, tracking historical pricing and quantities, with a stock-capped purchase flow in the UI.
+- **Admin Dashboard**: A dedicated admin shell for vehicle CRUD/restock and high-level inventory & sales analytics (total revenue, low-stock alerts, most purchased vehicle).
 
 ## Tech Stack
+
+**Backend**
 - **Language**: Java 17
 - **Framework**: Spring Boot
 - **Database**: PostgreSQL
@@ -20,11 +23,21 @@ A comprehensive RESTful API built with Spring Boot for managing a car dealership
 - **Boilerplate Reduction**: Lombok
 - **Security**: Spring Security & `jjwt`
 - **Build Tool**: Maven
-- **Containerization**: Docker & Docker Compose
 - **Testing**: JUnit 5, Mockito, & Testcontainers (for reliable database integration tests)
 
+**Frontend**
+- **Library**: React (Vite)
+- **Styling**: Tailwind CSS
+- **Routing**: `react-router-dom`
+- **HTTP**: native `fetch` (no axios) via a small hand-rolled API client
+- **State**: React Context/state (no Redux)
+
+**Infrastructure**
+- **Containerization**: Docker & Docker Compose (Postgres + Spring Boot backend + nginx-served frontend, with nginx reverse-proxying `/api/*` and `/images/*` to the backend)
+
 ## Project Structure
-The application follows a standard layered architecture:
+
+**Backend** (`backend/src/main/java/.../`) follows a standard layered architecture:
 - `controller/`: REST API endpoints handling HTTP requests.
 - `service/`: Core business logic layer.
 - `repository/`: Spring Data JPA interfaces for database interaction.
@@ -34,6 +47,34 @@ The application follows a standard layered architecture:
 - `security/`: JWT filters, authentication providers, and security configurations.
 - `validation/`: Custom validation constraints and logic.
 - `exception/`: Global exception handling (e.g., `InsufficientStockException`).
+
+**Frontend** (`frontend/src/`):
+- `api/`: `fetch`-based client + one module per resource (`auth`, `vehicles`, `purchases`, `stats`).
+- `pages/`: Route-level views (`HomePage`, `VehiclesPage`, `LoginPage`, `RegisterPage`, `AdminOverviewPage`, `AdminVehiclesPage`, `AdminStatsPage`).
+- `layouts/`: `PublicLayout` (navbar + outlet) and `AdminLayout` (sidebar/topbar + outlet).
+- `routes/`: `ProtectedRoute` and `AdminRoute` guards based on `AuthContext`.
+- `context/`: `AuthContext` — token/role/fullName persisted to `localStorage`.
+- `components/`: Shared UI (vehicle cards/grid, search/pagination, modals, toasts, stat cards).
+
+## Screenshots
+
+**Home** — landing page with featured listings:
+
+![Home page hero with a "Find Your Perfect Car" banner and a grid of featured vehicle cards](docs/screenshots/home-page.png)
+
+![Closeup of the featured listings grid with in-stock/out-of-stock badges and a "Browse Cars" call to action](docs/screenshots/home-featured-listings.png)
+
+**Vehicle Dashboard (public listing)** — browse and search live inventory, with stock-aware "Purchase" buttons:
+
+![Vehicle dashboard showing a grid of vehicle cards with make/model/category/price search filters](docs/screenshots/vehicle-dashboard.png)
+
+**Admin: Dashboard** — inventory health and sales analytics at a glance (Admin only):
+
+![Admin dashboard showing total vehicles, low stock, out of stock, total revenue, total sales, and an inventory health bar](docs/screenshots/admin-dashboard.png)
+
+**Admin: Car Listing** — inline edit, delete, and restock controls (Admin only):
+
+![Admin car listing table with photo, make, model, category, price, quantity, and edit/delete/restock actions](docs/screenshots/admin-car-listing.png)
 
 ## Getting Started
 
@@ -118,4 +159,22 @@ cd backend
 * `GET /api/health`: Basic health check endpoint returning system status.
 
 ## My AI Usage
-This README.md file was generated by an AI assistant by comprehensively analyzing the project's `pom.xml`, entity classes (`User`, `Vehicle`, `Purchase`), controllers, and existing configuration files to document the architecture, features, and setup instructions.
+
+This project was built in close collaboration with an AI coding assistant (Claude, Antigravity), under a strict, human-approved workflow defined in [`AGENTS.md`](AGENTS.md). Every AI-assisted change follows Test-Driven Development's Red → Green → Refactor cycle, and **every single phase required my explicit review and approval before the AI was allowed to commit** — nothing was auto-committed or auto-pushed. The full, unedited, chronological log of every prompt I gave the AI and every response it produced is kept in [`PROMPTS.md`](PROMPTS.md); this section is a summary of that log, not a replacement for it.
+
+### What the AI was used for
+
+- **Backend (Spring Boot)** — Every story (project scaffolding, `User`/`Role`/`UserRepository`, registration + BCrypt hashing, JWT authentication, `Vehicle` CRUD, search/filter specifications, restocking, `Purchase` processing with optimistic locking, inventory/sales analytics endpoints, image uploads) was implemented with the use of AI one TDD phase at a time: it wrote failing tests first (RED), the minimum code to pass them (GREEN), then refactored under my direction (REFACTOR — e.g. introducing MapStruct mappers, extracting a `StockService`, moving to DTO-only controller responses so JPA entities are never serialized directly, decoupling `UserDetails` into a dedicated `CustomUserDetails`).
+- **Frontend (React + Vite + Tailwind)** — I had the AI to implement it end-to-end: the API client layer, auth context/route guards, the public vehicle dashboard with search and pagination, the purchase flow, and the admin shell (vehicle management table, restock/edit/delete, and the inventory/sales stats dashboard).
+- **Infrastructure** — Dockerizing both services, writing the multi-stage `Dockerfile`s and the root `docker-compose.yml`, configuring the nginx reverse proxy so the browser only ever talks same-origin, and diagnosing real issues along the way (a `*.war` vs `*.jar` Docker build bug, host port conflicts with a locally-running Postgres/backend, a stale Testcontainers artifact-id break).
+
+### What I did, not the AI
+
+- Reviewed and explicitly approved every RED/GREEN/REFACTOR phase before it was committed — the AI was never allowed to proceed or commit unilaterally.
+- Made every scope, architecture, and design-tradeoff call (e.g., rejecting a premature `BaseAppException` abstraction, choosing the nginx reverse-proxy approach over opening CORS to the browser, choosing to remap Docker host ports rather than kill my locally-running services).
+- Caught and corrected AI mistakes directly, including one case where copied-looking boilerplate made it into a commit — I had those commits identified and squashed out of history before pushing.
+- Wrote this disclosure and curated which parts of `PROMPTS.md` are summarized here.
+
+### Guardrails this repo enforces on AI usage
+
+Defined in `AGENTS.md` and followed throughout: an originality policy (no reproducing code from tutorials/Stack Overflow/other repos verbatim), a testing policy (fast, isolated unit tests by default; `@DataJpaTest`/Testcontainers only for real persistence behavior; no incidental `@SpringBootTest`), a "smallest change necessary" implementation policy (no speculative abstractions or unrequested dependencies), and a commit policy requiring a truthful, per-commit AI-usage disclosure in every commit message.
