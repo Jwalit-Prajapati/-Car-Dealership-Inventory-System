@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { list, search } from '../api/vehicles';
 import { ApiError } from '../api/client';
 import { useToast } from '../components/ToastProvider';
@@ -21,8 +21,15 @@ function hasActiveFilters(filters) {
   return Object.values(filters).some((value) => value !== undefined && value !== '');
 }
 
-export default function DashboardPage() {
-  const [filters, setFilters] = useState({});
+export default function VehiclesPage() {
+  const [searchParams] = useSearchParams();
+  const [filters, setFilters] = useState(() => ({
+    make: searchParams.get('make') || '',
+    model: searchParams.get('model') || '',
+    category: searchParams.get('category') || '',
+    minPrice: searchParams.get('minPrice') || '',
+    maxPrice: searchParams.get('maxPrice') || '',
+  }));
   const [page, setPage] = useState(0);
   const [vehiclePage, setVehiclePage] = useState(EMPTY_PAGE);
   const [loading, setLoading] = useState(true);
@@ -95,9 +102,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <h1 className="text-2xl font-semibold">Vehicle Dashboard</h1>
-      <SearchFilterBar onSearch={handleSearch} onClear={handleClear} />
+    <div className="mx-auto max-w-7xl space-y-6 p-6">
+      <h1 className="text-2xl font-semibold text-text-primary">Browse Vehicles</h1>
+      <SearchFilterBar initialFilters={filters} onSearch={handleSearch} onClear={handleClear} />
       <VehicleGrid vehicles={vehiclePage.content} loading={loading} onPurchase={handlePurchaseClick} />
       <PaginationControls
         page={vehiclePage.number}

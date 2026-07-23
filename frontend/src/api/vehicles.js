@@ -23,3 +23,9 @@ export function remove(id) {
 export function restock(id, quantity) {
   return apiClient.post(`/api/vehicles/${id}/restock`, { quantity });
 }
+
+export function uploadImage(id, file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return apiClient.postForm(`/api/vehicles/${id}/image`, formData);
+}

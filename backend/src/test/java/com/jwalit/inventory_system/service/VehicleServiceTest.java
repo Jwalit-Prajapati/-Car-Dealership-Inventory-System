@@ -53,7 +53,7 @@ class VehicleServiceTest {
         savedVehicle.setQuantity(5);
 
         VehicleResponseDTO expectedDto = new VehicleResponseDTO(1L, "Honda", "Civic", "Sedan",
-                new BigDecimal("22000"), 5);
+                new BigDecimal("22000"), 5, null);
 
         when(vehicleMapper.toEntity(any(VehicleRequestDTO.class))).thenReturn(mappedVehicle);
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(savedVehicle);
@@ -82,7 +82,7 @@ class VehicleServiceTest {
         savedVehicle.setMake(request.make());
 
         VehicleResponseDTO expectedDto = new VehicleResponseDTO(1L, request.make(), "Civic", "Sedan",
-                new BigDecimal("22000"), 5);
+                new BigDecimal("22000"), 5, null);
 
         when(vehicleRepository.findById(1L)).thenReturn(java.util.Optional.of(existingVehicle));
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(savedVehicle);

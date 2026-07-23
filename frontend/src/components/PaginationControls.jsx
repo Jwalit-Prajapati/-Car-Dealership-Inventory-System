@@ -13,7 +13,7 @@ export default function PaginationControls({ page, totalPages, totalElements, on
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-text-muted">
         {totalElements} vehicle{totalElements === 1 ? '' : 's'}
         {totalPages > 1 && ` — page ${page + 1} of ${totalPages}`}
       </p>
@@ -23,7 +23,7 @@ export default function PaginationControls({ page, totalPages, totalElements, on
             type="button"
             onClick={() => onPageChange(page - 1)}
             disabled={page === 0}
-            className="rounded border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded border border-border-subtle px-3 py-1 text-sm text-text-secondary hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Prev
           </button>
@@ -34,8 +34,8 @@ export default function PaginationControls({ page, totalPages, totalElements, on
               onClick={() => onPageChange(pageNumber)}
               className={`rounded px-3 py-1 text-sm ${
                 pageNumber === page
-                  ? 'bg-slate-900 text-white'
-                  : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                  ? 'bg-[var(--accent)] text-white'
+                  : 'border border-border-subtle text-text-secondary hover:bg-surface-2'
               }`}
             >
               {pageNumber + 1}
@@ -45,7 +45,7 @@ export default function PaginationControls({ page, totalPages, totalElements, on
             type="button"
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages - 1}
-            className="rounded border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded border border-border-subtle px-3 py-1 text-sm text-text-secondary hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Next
           </button>

@@ -10,17 +10,17 @@ export default function ConfirmDialog({
 }) {
   return (
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/50 p-4"
+      className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 p-4"
       onClick={onCancel}
     >
       <div
         role="alertdialog"
         aria-modal="true"
-        className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl"
+        className="w-full max-w-sm rounded-lg border border-border-subtle bg-surface-1 p-6 shadow-xl"
         onClick={(event) => event.stopPropagation()}
       >
-        <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-        <p className="mt-2 text-sm text-slate-600">{message}</p>
+        <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
+        <p className="mt-2 text-sm text-text-secondary">{message}</p>
         <div className="mt-6 flex gap-2">
           <button
             type="button"
@@ -35,7 +35,7 @@ export default function ConfirmDialog({
             type="button"
             disabled={busy}
             onClick={onCancel}
-            className="w-full rounded border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+            className="w-full rounded border border-border-subtle px-4 py-2 text-text-secondary hover:bg-surface-2 disabled:opacity-50"
           >
             Cancel
           </button>

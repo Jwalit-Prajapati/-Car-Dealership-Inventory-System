@@ -13,6 +13,14 @@ spring:
     web:
       pageable:
         max-page-size: 100
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+app:
+  upload:
+    dir: ${UPLOAD_DIR:uploads}
 
 jwt:
   # Required, no default. Must be a base64-encoded key (JwtService decodes it, not raw text) —

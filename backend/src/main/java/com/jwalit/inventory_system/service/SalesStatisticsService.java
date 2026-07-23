@@ -28,7 +28,7 @@ public class SalesStatisticsService {
         VehicleResponseDTO topVehicle = null;
         if (topVehicleData != null && !topVehicleData.isEmpty()) {
             com.jwalit.inventory_system.repository.VehiclePurchaseCountRow row = topVehicleData.get(0);
-            topVehicle = new VehicleResponseDTO(row.vehicleId(), row.make(), row.model(), row.category(), row.price(), row.quantity());
+            topVehicle = new VehicleResponseDTO(row.vehicleId(), row.make(), row.model(), row.category(), row.price(), row.quantity(), null);
         }
 
         return new SalesStatisticsResponse(

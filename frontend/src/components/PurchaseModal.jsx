@@ -42,35 +42,35 @@ export default function PurchaseModal({ vehicle, onClose, onSuccess }) {
 
   return (
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/50 p-4"
+      className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 p-4"
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl"
+        className="w-full max-w-sm rounded-lg border border-border-subtle bg-surface-1 p-6 shadow-xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-2">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-lg font-semibold text-text-primary">
             Purchase {vehicle.make} {vehicle.model}
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-slate-400 hover:text-slate-600"
+            className="text-text-muted hover:text-text-primary"
           >
             ×
           </button>
         </div>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-text-muted">
           {currencyFormatter.format(vehicle.price)} each &middot; {maxQuantity} in stock
         </p>
 
         <form onSubmit={handleSubmit} noValidate className="mt-4 space-y-4">
           <div>
-            <label htmlFor="purchase-quantity" className="block text-sm font-medium text-slate-700">
+            <label htmlFor="purchase-quantity" className="block text-sm font-medium text-text-secondary">
               Quantity
             </label>
             <div className="mt-1 flex items-center gap-2">
@@ -78,7 +78,7 @@ export default function PurchaseModal({ vehicle, onClose, onSuccess }) {
                 type="button"
                 onClick={() => updateQuantity(quantity - 1)}
                 disabled={quantity <= 1}
-                className="rounded border border-slate-300 px-3 py-2 text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                className="rounded border border-border-subtle px-3 py-2 text-text-secondary hover:bg-surface-2 disabled:opacity-50"
               >
                 −
               </button>
@@ -89,21 +89,21 @@ export default function PurchaseModal({ vehicle, onClose, onSuccess }) {
                 max={maxQuantity}
                 value={quantity}
                 onChange={(event) => updateQuantity(Number(event.target.value))}
-                className="w-full rounded border border-slate-300 px-3 py-2 text-center focus:border-slate-500 focus:outline-none"
+                className="w-full rounded border border-border-subtle bg-surface-2 px-3 py-2 text-center text-text-primary focus:border-[var(--accent)] focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => updateQuantity(quantity + 1)}
                 disabled={quantity >= maxQuantity}
-                className="rounded border border-slate-300 px-3 py-2 text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                className="rounded border border-border-subtle px-3 py-2 text-text-secondary hover:bg-surface-2 disabled:opacity-50"
               >
                 +
               </button>
             </div>
-            {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+            {error && <p className="mt-1 text-sm text-red-400">{error}</p>}
           </div>
 
-          <p className="text-sm font-medium text-slate-900">
+          <p className="text-sm font-medium text-text-primary">
             Total: {currencyFormatter.format(vehicle.price * quantity)}
           </p>
 
@@ -111,7 +111,7 @@ export default function PurchaseModal({ vehicle, onClose, onSuccess }) {
             <button
               type="submit"
               disabled={submitting || maxQuantity === 0}
-              className="flex w-full items-center justify-center gap-2 rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded bg-[var(--accent)] px-4 py-2 text-white hover:bg-[var(--accent-hover)] disabled:opacity-50"
             >
               {submitting && <Spinner />}
               {submitting ? 'Purchasing...' : 'Confirm purchase'}
@@ -119,7 +119,7 @@ export default function PurchaseModal({ vehicle, onClose, onSuccess }) {
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50"
+              className="w-full rounded border border-border-subtle px-4 py-2 text-text-secondary hover:bg-surface-2"
             >
               Cancel
             </button>

@@ -46,6 +46,9 @@ public class Vehicle {
     @jakarta.persistence.Version
     private Long version;
 
+    @jakarta.persistence.Column(name = "image_url", length = 500)
+    private String imageUrl;
+
 
     public void addStock(int amount) {
         this.quantity = this.quantity + amount;

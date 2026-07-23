@@ -93,7 +93,7 @@ class VehicleControllerTest {
     }
 
     private VehicleResponseDTO createMockResponse(Long id) {
-        return new VehicleResponseDTO(id, "Toyota", "Camry", "Sedan", new BigDecimal("25000"), 10);
+        return new VehicleResponseDTO(id, "Toyota", "Camry", "Sedan", new BigDecimal("25000"), 10, null);
     }
 
     @Test

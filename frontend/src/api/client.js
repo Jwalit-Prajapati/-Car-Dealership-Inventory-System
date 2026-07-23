@@ -49,9 +49,41 @@ async function request(method, path, { body, params } = {}) {
   return data;
 }
 
+async function requestForm(method, path, formData) {
+  const url = new URL(path, BASE_URL);
+  const headers = {};
+  const token = localStorage.getItem('token');
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  let response;
+  try {
+    response = await fetch(url, { method, headers, body: formData });
+  } catch {
+    throw new ApiError("Can't reach the server. Please check your connection and try again.", 0);
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const message = data?.message || 'Something went wrong';
+    throw new ApiError(message, response.status);
+  }
+
+  return data;
+}
+
 export const apiClient = {
   get: (path, params) => request('GET', path, { params }),
   post: (path, body) => request('POST', path, { body }),
   put: (path, body) => request('PUT', path, { body }),
   delete: (path) => request('DELETE', path),
+  postForm: (path, formData) => requestForm('POST', path, formData),
 };
+
+export { BASE_URL };

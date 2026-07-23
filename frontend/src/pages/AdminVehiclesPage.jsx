@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { list, create, update, remove, restock } from '../api/vehicles';
-import { ApiError } from '../api/client';
+import { useSearchParams } from 'react-router-dom';
+import { Plus } from 'lucide-react';
+import { list, search, create, update, remove, restock, uploadImage } from '../api/vehicles';
+import { ApiError, BASE_URL } from '../api/client';
 import { useToast } from '../components/ToastProvider';
 import PaginationControls from '../components/PaginationControls';
 import VehicleFormModal from '../components/VehicleFormModal';
@@ -47,13 +49,13 @@ function RestockControl({ vehicle, onRestock }) {
         value={amount}
         onChange={(event) => setAmount(event.target.value)}
         placeholder="Qty"
-        className="w-16 rounded border border-slate-300 px-2 py-1 text-sm focus:border-slate-500 focus:outline-none"
+        className="w-16 rounded border border-border-subtle bg-surface-2 px-2 py-1 text-sm text-text-primary focus:border-[var(--accent)] focus:outline-none"
       />
       <button
         type="button"
         onClick={handleRestock}
         disabled={submitting}
-        className="flex items-center gap-1 rounded border border-slate-300 px-2 py-1 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+        className="flex items-center gap-1 rounded border border-border-subtle px-2 py-1 text-sm text-text-secondary hover:bg-surface-2 disabled:opacity-50"
       >
         {submitting && <Spinner className="h-3 w-3" />}
         Restock
@@ -63,6 +65,8 @@ function RestockControl({ vehicle, onRestock }) {
 }
 
 export default function AdminVehiclesPage() {
+  const [searchParams] = useSearchParams();
+  const makeFilter = searchParams.get('make') || '';
   const [page, setPage] = useState(0);
   const [vehiclePage, setVehiclePage] = useState(EMPTY_PAGE);
   const [loading, setLoading] = useState(true);
@@ -74,7 +78,9 @@ export default function AdminVehiclesPage() {
   async function fetchVehicles() {
     setLoading(true);
     try {
-      const data = await list({ page, size: PAGE_SIZE, sort: 'id' });
+      const data = makeFilter
+        ? await search({ make: makeFilter, page, size: PAGE_SIZE })
+        : await list({ page, size: PAGE_SIZE, sort: 'id' });
       setVehiclePage(data);
     } catch (error) {
       const message = error instanceof ApiError ? error.message : 'Unable to load vehicles.';
@@ -90,18 +96,23 @@ export default function AdminVehiclesPage() {
       await fetchVehicles();
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  }, [page, makeFilter]);
 
-  async function handleFormSubmit(payload) {
+  async function handleFormSubmit(payload, imageFile) {
+    let saved;
     if (formVehicle) {
-      await update(formVehicle.id, payload);
+      saved = await update(formVehicle.id, payload);
       showSuccess(`Updated ${payload.make} ${payload.model}.`);
     } else {
-      await create(payload);
+      saved = await create(payload);
       showSuccess(`Added ${payload.make} ${payload.model}.`);
+    }
+    if (imageFile) {
+      saved = await uploadImage(saved.id, imageFile);
     }
     setFormVehicle(undefined);
     await fetchVehicles();
+    return saved;
   }
 
   async function handleRestock(vehicle, quantity) {
@@ -132,20 +143,25 @@ export default function AdminVehiclesPage() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Admin: Vehicles</h1>
+        <h1 className="text-2xl font-semibold text-text-primary">
+          Car Listing
+          {makeFilter && <span className="ml-2 text-base font-normal text-text-muted">— "{makeFilter}"</span>}
+        </h1>
         <button
           type="button"
           onClick={() => setFormVehicle(null)}
-          className="rounded bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-800"
+          className="flex items-center gap-2 rounded bg-[var(--accent)] px-4 py-2 text-sm text-white hover:bg-[var(--accent-hover)]"
         >
+          <Plus className="h-4 w-4" />
           Add vehicle
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200">
-        <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-slate-500">
+      <div className="overflow-x-auto rounded-lg border border-border-subtle">
+        <table className="min-w-full divide-y divide-border-subtle text-sm">
+          <thead className="bg-surface-1 text-left text-text-muted">
             <tr>
+              <th className="px-4 py-3 font-medium">Photo</th>
               <th className="px-4 py-3 font-medium">Make</th>
               <th className="px-4 py-3 font-medium">Model</th>
               <th className="px-4 py-3 font-medium">Category</th>
@@ -154,10 +170,10 @@ export default function AdminVehiclesPage() {
               <th className="px-4 py-3 font-medium">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-border-subtle bg-surface-1">
             {loading && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-slate-500">
+                <td colSpan={7} className="px-4 py-6 text-center text-text-muted">
                   <div className="flex items-center justify-center gap-2">
                     <Spinner />
                     Loading...
@@ -167,7 +183,7 @@ export default function AdminVehiclesPage() {
             )}
             {!loading && vehiclePage.content.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-slate-500">
+                <td colSpan={7} className="px-4 py-6 text-center text-text-muted">
                   No vehicles yet.
                 </td>
               </tr>
@@ -175,24 +191,37 @@ export default function AdminVehiclesPage() {
             {!loading &&
               vehiclePage.content.map((vehicle) => (
                 <tr key={vehicle.id}>
-                  <td className="px-4 py-3 font-medium text-slate-900">{vehicle.make}</td>
-                  <td className="px-4 py-3">{vehicle.model}</td>
-                  <td className="px-4 py-3 text-slate-500">{vehicle.category || '—'}</td>
-                  <td className="px-4 py-3">{currencyFormatter.format(vehicle.price)}</td>
-                  <td className="px-4 py-3">{vehicle.quantity}</td>
+                  <td className="px-4 py-3">
+                    {vehicle.imageUrl ? (
+                      <img
+                        src={`${BASE_URL}${vehicle.imageUrl}`}
+                        alt={`${vehicle.make} ${vehicle.model}`}
+                        className="h-10 w-14 rounded object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-10 w-14 items-center justify-center rounded bg-surface-2 text-xs text-text-muted">
+                        —
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-text-primary">{vehicle.make}</td>
+                  <td className="px-4 py-3 text-text-secondary">{vehicle.model}</td>
+                  <td className="px-4 py-3 text-text-muted">{vehicle.category || '—'}</td>
+                  <td className="px-4 py-3 text-text-secondary">{currencyFormatter.format(vehicle.price)}</td>
+                  <td className="px-4 py-3 text-text-secondary">{vehicle.quantity}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <button
                         type="button"
                         onClick={() => setFormVehicle(vehicle)}
-                        className="rounded border border-slate-300 px-2 py-1 text-slate-700 hover:bg-slate-50"
+                        className="rounded border border-border-subtle px-2 py-1 text-text-secondary hover:bg-surface-2"
                       >
                         Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => setDeleteTarget(vehicle)}
-                        className="rounded border border-red-200 px-2 py-1 text-red-600 hover:bg-red-50"
+                        className="rounded border border-red-900/50 px-2 py-1 text-red-400 hover:bg-red-500/10"
                       >
                         Delete
                       </button>

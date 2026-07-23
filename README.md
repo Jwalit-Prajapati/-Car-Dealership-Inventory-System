@@ -45,10 +45,11 @@ The application follows a standard layered architecture:
 ### Local Development Setup
 
 1. **Start the Database**
-   The project includes a root-level `docker-compose.yml` to quickly spin up a PostgreSQL instance.
+   The project includes a root-level `docker-compose.yml` to quickly spin up a PostgreSQL instance. It publishes Postgres on host port `5433` (not the default `5432`) so it doesn't clash with a locally installed Postgres.
    ```bash
    docker-compose up -d db
    ```
+   If you run the backend natively against this container (step 3), override the datasource URL to match: `SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/inventory_db` (PowerShell: `$env:SPRING_DATASOURCE_URL = "jdbc:postgresql://localhost:5433/inventory_db"`). Skip this if you're pointing at your own local Postgres install on `5432` instead.
 
 2. **Set required environment variables**
    The app reads its JWT signing key from `JWT_SECRET` (`backend/src/main/resources/application.yml`) — there is no default, so the app won't boot without it. It must be **base64-encoded** (it's decoded as a key, not used as raw text). Generate one and export it before running natively:
@@ -79,8 +80,9 @@ The application follows a standard layered architecture:
    ```bash
    docker-compose up -d --build
    ```
-   - Backend: `http://localhost:8080`
-   - Frontend: `http://localhost:3000` — served by nginx, which also reverse-proxies `/api/*` to the backend container, so the browser never makes cross-origin calls.
+   - Backend: `http://localhost:8081` (published on `8081`, not `8080`, to avoid clashing with a natively-running backend)
+   - Postgres: `localhost:5433`
+   - Frontend: `http://localhost:3000` — served by nginx, which also reverse-proxies `/api/*` to the backend container over the internal Docker network (`backend:8080`), so the browser never makes cross-origin calls and never needs the `8081` mapping directly.
 
 ## Testing
 This project embraces Test-Driven Development (TDD) with isolated, fast-running tests. Persistence layer tests are backed by Testcontainers for true database verification without mocking the database engine.

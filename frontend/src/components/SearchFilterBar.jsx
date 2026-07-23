@@ -3,10 +3,10 @@ import { useState } from 'react';
 const EMPTY_FILTERS = { make: '', model: '', category: '', minPrice: '', maxPrice: '' };
 
 const FIELD_CLASS =
-  'mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none';
+  'mt-1 w-full rounded border border-border-subtle bg-surface-1 px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-[var(--accent)] focus:outline-none';
 
-export default function SearchFilterBar({ onSearch, onClear }) {
-  const [fields, setFields] = useState(EMPTY_FILTERS);
+export default function SearchFilterBar({ initialFilters, onSearch, onClear }) {
+  const [fields, setFields] = useState(() => ({ ...EMPTY_FILTERS, ...initialFilters }));
 
   function updateField(name, value) {
     setFields((current) => ({ ...current, [name]: value }));
@@ -29,9 +29,12 @@ export default function SearchFilterBar({ onSearch, onClear }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+    <form
+      onSubmit={handleSubmit}
+      className="grid grid-cols-2 gap-3 rounded-lg border border-border-subtle bg-surface-1 p-4 sm:grid-cols-3 lg:grid-cols-6"
+    >
       <div>
-        <label htmlFor="filter-make" className="block text-sm font-medium text-slate-700">
+        <label htmlFor="filter-make" className="block text-sm font-medium text-text-secondary">
           Make
         </label>
         <input
@@ -43,7 +46,7 @@ export default function SearchFilterBar({ onSearch, onClear }) {
         />
       </div>
       <div>
-        <label htmlFor="filter-model" className="block text-sm font-medium text-slate-700">
+        <label htmlFor="filter-model" className="block text-sm font-medium text-text-secondary">
           Model
         </label>
         <input
@@ -55,7 +58,7 @@ export default function SearchFilterBar({ onSearch, onClear }) {
         />
       </div>
       <div>
-        <label htmlFor="filter-category" className="block text-sm font-medium text-slate-700">
+        <label htmlFor="filter-category" className="block text-sm font-medium text-text-secondary">
           Category
         </label>
         <input
@@ -67,7 +70,7 @@ export default function SearchFilterBar({ onSearch, onClear }) {
         />
       </div>
       <div>
-        <label htmlFor="filter-min-price" className="block text-sm font-medium text-slate-700">
+        <label htmlFor="filter-min-price" className="block text-sm font-medium text-text-secondary">
           Min price
         </label>
         <input
@@ -80,7 +83,7 @@ export default function SearchFilterBar({ onSearch, onClear }) {
         />
       </div>
       <div>
-        <label htmlFor="filter-max-price" className="block text-sm font-medium text-slate-700">
+        <label htmlFor="filter-max-price" className="block text-sm font-medium text-text-secondary">
           Max price
         </label>
         <input
@@ -95,14 +98,14 @@ export default function SearchFilterBar({ onSearch, onClear }) {
       <div className="flex items-end gap-2">
         <button
           type="submit"
-          className="w-full rounded bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-800"
+          className="w-full rounded bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--accent-hover)]"
         >
           Search
         </button>
         <button
           type="button"
           onClick={handleClear}
-          className="w-full rounded border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+          className="w-full rounded border border-border-subtle px-4 py-2 text-sm text-text-secondary hover:bg-surface-2"
         >
           Clear
         </button>

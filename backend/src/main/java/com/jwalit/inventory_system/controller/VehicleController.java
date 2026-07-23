@@ -10,6 +10,7 @@ import com.jwalit.inventory_system.service.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -80,5 +82,13 @@ public class VehicleController {
             @Valid @RequestBody RestockRequest restockRequest) {
         stockService.restock(id, restockRequest.quantity());
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<VehicleResponseDTO> uploadVehicleImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(vehicleService.updateImage(id, file));
     }
 }

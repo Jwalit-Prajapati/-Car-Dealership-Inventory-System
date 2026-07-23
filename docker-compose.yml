@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin@123
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
@@ -15,12 +15,15 @@ services:
     build: ./backend
     container_name: inventory-app
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/inventory_db
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin@123
       - JWT_SECRET=tbBuiiqfAT/zMaxn6F2dGBQi58Jr/2du87efvsmBsHdW2lnSFYDsdg8FUe6tUB6h
+      - UPLOAD_DIR=/app/uploads
+    volumes:
+      - vehicle-images:/app/uploads
     depends_on:
       - db
 
@@ -34,3 +37,4 @@ services:
 
 volumes:
   postgres-data:
+  vehicle-images:

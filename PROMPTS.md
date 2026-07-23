@@ -1488,3 +1488,58 @@ Implemented:
 8. Updated `README.md`'s "Local Development Setup" section: removed the `cd backend` prefix from the `docker-compose` commands (compose file now lives at root), documented running the frontend dev server (`npm run dev`) alongside the native backend, and documented the full containerized stack (`docker-compose up -d --build`) with its port mapping and reverse-proxy behavior.
 
 Awaiting the PROMPTS.md update (this entry) and the commit to GitHub.
+
+## 2026-07-23T15:25:37+05:30
+
+**User Prompt:**
+resolve this issue
+One thing worth knowing: ports 8080 and 5432 on your machine are already bound (likely your locally-running backend/Postgres), so docker-compose up -d will fail until those are freed or you remap the host ports in docker-compose.yml.
+
+**AI Response:**
+Checked which processes held the ports (`netstat` + `Get-Process`): PID 19540 was a native `java.exe` on `8080` and PID 6996 was a native `postgres` process on `5432` — both pre-existing local services, not something to kill without asking. Offered a choice between remapping Docker's host ports vs. stopping those local processes; user chose the remap so Docker and local dev can coexist.
+
+Changes:
+1. `docker-compose.yml` — `db` now publishes `5433:5432` and `backend` now publishes `8081:8080` (container-internal ports unchanged, so the `SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/...` and the frontend's nginx `proxy_pass http://backend:8080/...` needed no changes).
+2. `README.md` — updated the Docker Compose full-stack section with the new host ports (`8081`, `5433`, frontend still `3000`), and added a note to the "Start the Database" step explaining that running the backend natively against the dockerized Postgres now requires overriding `SPRING_DATASOURCE_URL` to point at `5433`.
+
+Re-verified with the real (non-overridden) ports this time: `docker compose up -d --build` started all three containers with no port conflicts; confirmed `http://localhost:8081/api/vehicles` (backend direct), `http://localhost:3000/` (frontend static), and `http://localhost:3000/api/vehicles` (frontend→backend proxy) all returned 200. Tore the stack down (`docker compose down -v`) afterward.
+
+## 2026-07-23T~16:00–18:10+05:30 (reconstructed)
+
+**Note:** This entry covers a conversation that ran in a session cleared with `/clear` before this logging request was made, so the exact prompt/response text isn't available. This summary is reconstructed from the working-tree diff left behind: the vehicle image-upload feature end to end, a homepage/admin-layout redesign of the frontend, and a repo cleanup (`frontend-plan.md` and the `scratch/` directory removed now that the frontend build-out is complete).
+
+**User Prompt:**
+Asked to add image uploads for vehicles (admin-only) so listings show a real photo instead of a placeholder, and to restructure the frontend around a public marketing home page plus a dedicated admin shell (sidebar/topbar) instead of a single flat dashboard route.
+
+**AI Response:**
+
+Backend — vehicle image upload:
+- `Vehicle.java` — added `imageUrl` column (`@Column(name = "image_url", length = 500)`); `V9__add_image_url_to_vehicles.sql` Flyway migration adds the column.
+- `VehicleResponseDTO` — added `imageUrl` field so the frontend can render it.
+- `exception/InvalidFileException.java` — new `ApiException` subclass (400) for missing/invalid uploads.
+- `VehicleService.updateImage(id, file)` — validates the file is non-empty and content-type is one of `image/jpeg`, `image/png`, `image/webp`; stores it under `app.upload.dir` (`${UPLOAD_DIR:uploads}`) as a random UUID filename, deletes the vehicle's previous image file if one existed, and persists the new `/images/{filename}` URL.
+- `VehicleController` — added `POST /api/vehicles/{id}/image` (`multipart/form-data`, `@PreAuthorize("hasRole('ADMIN')")`).
+- `config/WebConfig.java` — new `WebMvcConfigurer` exposing `/images/**` as a static resource handler backed by `app.upload.dir`.
+- `SecurityConfig` — permitted `GET /images/**` so uploaded photos are publicly viewable; added `http://localhost:3000` to allowed CORS origins.
+- `application.yml` — added `spring.servlet.multipart` limits (5MB) and the `app.upload.dir` property.
+- `backend/.gitignore` — added `uploads/`.
+- `docker-compose.yml` — added a `vehicle-images` named volume mounted at `/app/uploads` in the backend container and `UPLOAD_DIR=/app/uploads`; `frontend/nginx.conf` reverse-proxies `/images/` to the backend so uploaded photos load same-origin in the containerized stack.
+
+Frontend — layout redesign:
+- Introduced `layouts/PublicLayout.jsx` (renders `Navbar` + `Outlet`) and `layouts/AdminLayout.jsx` (renders `AdminSidebar` + `AdminTopbar` + `Outlet`) so route groups no longer duplicate chrome.
+- New `components/AdminSidebar.jsx` and `components/AdminTopbar.jsx` for the admin shell, using `lucide-react` icons (added to `frontend/package.json`).
+- Replaced the old single `DashboardPage.jsx` with `pages/HomePage.jsx` (public marketing/landing view) and `pages/VehiclesPage.jsx` (the actual searchable/paginated inventory grid, reusing `VehicleGrid`/`SearchFilterBar`/`PaginationControls`).
+- Added `pages/AdminOverviewPage.jsx` as the new `/admin` landing page (inventory + sales stats summary), demoting the old `AdminStatsPage` to `/admin/stats`.
+- `App.jsx` re-wired to nest routes under the two layouts: `/`, `/vehicles`, `/login`, `/register` under `PublicLayout`; `/admin`, `/admin/stats`, `/admin/vehicles` under `AdminRoute` → `AdminLayout`.
+- `VehicleCard.jsx` and `VehicleFormModal.jsx` updated to display/upload the vehicle image (`imageUrl`), wired to the new `POST /api/vehicles/{id}/image` endpoint via `api/vehicles.js`.
+
+Repo cleanup:
+- Deleted `frontend-plan.md` (all 7 phases complete, plan no longer needed) and the `scratch/` directory (temporary commit-message/prompt drafts from earlier sessions).
+
+## 2026-07-23T18:15:37+05:30
+
+**User Prompt:**
+update prompt.md and push the current state of the project to git hub.
+
+**AI Response:**
+Reviewed the full working-tree diff since the last commit (`f4a3985`) and found it covered two sessions' worth of unlogged work: the port-remap fix already drafted in `PROMPTS.md` plus an entire undocumented session (vehicle image uploads end-to-end, the `HomePage`/`VehiclesPage`/admin-sidebar layout redesign, and the `frontend-plan.md`/`scratch/` cleanup). Reconstructed and appended that missing entry to `PROMPTS.md` from the diff before this one, then committed and pushed everything to GitHub.

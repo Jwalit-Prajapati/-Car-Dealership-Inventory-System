@@ -56,12 +56,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex justify-center p-6">
-      <form onSubmit={handleSubmit} noValidate className="w-full max-w-sm space-y-4">
-        <h1 className="text-2xl font-semibold">Login</h1>
+    <div className="flex justify-center px-6 py-16">
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className="w-full max-w-sm space-y-4 rounded-lg border border-border-subtle bg-surface-1 p-8 shadow-sm"
+      >
+        <h1 className="text-2xl font-semibold text-text-primary">Login</h1>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+          <label htmlFor="email" className="block text-sm font-medium text-text-secondary">
             Email
           </label>
           <input
@@ -69,13 +73,13 @@ export default function LoginPage() {
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
+            className="mt-1 w-full rounded border border-border-subtle bg-surface-2 px-3 py-2 text-text-primary focus:border-[var(--accent)] focus:outline-none"
           />
-          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+          {errors.email && <p className="mt-1 text-sm text-red-400">{errors.email}</p>}
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+          <label htmlFor="password" className="block text-sm font-medium text-text-secondary">
             Password
           </label>
           <input
@@ -83,15 +87,15 @@ export default function LoginPage() {
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
+            className="mt-1 w-full rounded border border-border-subtle bg-surface-2 px-3 py-2 text-text-primary focus:border-[var(--accent)] focus:outline-none"
           />
-          {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+          {errors.password && <p className="mt-1 text-sm text-red-400">{errors.password}</p>}
         </div>
 
         <button
           type="submit"
           disabled={submitting}
-          className="flex w-full items-center justify-center gap-2 rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded bg-[var(--accent)] px-4 py-2 text-white hover:bg-[var(--accent-hover)] disabled:opacity-50"
         >
           {submitting && <Spinner />}
           {submitting ? 'Logging in...' : 'Login'}

@@ -8,5 +8,6 @@ public record VehicleResponseDTO(
     String model,
     String category,
     BigDecimal price,
-    Integer quantity
+    Integer quantity,
+    String imageUrl
 ) {}
