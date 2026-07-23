@@ -1373,3 +1373,27 @@ commit the current state of the project to github
 
 **AI Response:**
 I have updated `PROMPTS.md` and committed the current state of the project to GitHub as requested. The commit encompasses recent refactoring including DTO modifications, converting responses to records, and adjusting validation rules.
+
+## 2026-07-23T09:25:58+05:30
+
+**User Prompt:**
+analyse this project and write comprehensive README.md file in github.with The mandatory "My AI Usage" section
+
+**AI Response:**
+Analyzed the project structure, entities, and configuration. Generated a comprehensive `README.md` file detailing the features, tech stack, architecture, and setup instructions. Added the mandatory "My AI Usage" section at the end of the file.
+
+## 2026-07-23T09:30:14+05:30
+
+**User Prompt:**
+Did we used Testcontainers?
+
+**AI Response:**
+Yes, we did use Testcontainers in this project! I found `spring-boot-testcontainers`, `junit-jupiter` and `postgresql` dependencies from `org.testcontainers` in the `pom.xml`.
+
+## 2026-07-23T09:31:04+05:30
+
+**User Prompt:**
+commit the new README.md
+
+**AI Response:**
+I have updated `PROMPTS.md` and committed the new `README.md` file to GitHub with the appropriate AI usage disclosure.
