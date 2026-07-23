@@ -55,7 +55,7 @@ class PurchaseRepositoryTest {
 
         Vehicle vehicle = new Vehicle();
         vehicle.setMake("Toyota");
-        vehicle.setModel("Camry");
+        vehicle.setModel("Corolla");
         vehicle.setCategory("Sedan");
         vehicle.setPrice(new BigDecimal("25000.00"));
         vehicle.setQuantity(10);

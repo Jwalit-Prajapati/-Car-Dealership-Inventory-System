@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -72,6 +71,7 @@ class PurchaseIntegrationTest {
 
         Vehicle vehicle = new Vehicle();
         vehicle.setMake("Ford");
+        vehicle.setModel("F-150");
         vehicle.setCategory("Truck");
         vehicle.setPrice(BigDecimal.valueOf(30000));
         vehicle.setQuantity(10);
