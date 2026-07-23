@@ -1,3 +1,22 @@
+## This repository is maintained **only by me** (with AI assistance).
+
+An AI tool accidentally introduced changes that appeared to attribute contributions incorrectly. Those unintended changes have been **completely removed**.
+
+If GitHub still displays any unexpected contributor information, it is most likely due to **GitHub's caching or contribution graph update delay**, not because those changes still exist in the repository.
+
+### Clarification
+
+-  All code contributions in this repository are **my own**.
+-  AI has been used **only as a development assistant** (for suggestions, reviews, explanations, and code generation under my direction).
+-  No other person has contributed code to this repository.
+-  The accidental attribution issue has been resolved by removing the unintended changes.
+
+### Going Forward
+
+To prevent this from happening again, I have adopted a strict workflow and policy to ensure that AI-assisted commits never introduce incorrect author or contributor information in this repository.
+
+Thank you for your understanding.
+
 # Car Dealership Inventory System
 
 ## Overview
