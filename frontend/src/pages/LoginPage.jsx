@@ -4,6 +4,7 @@ import { login } from '../api/auth';
 import { ApiError } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/ToastProvider';
+import Spinner from '../components/Spinner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -90,8 +91,9 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 disabled:opacity-50"
         >
+          {submitting && <Spinner />}
           {submitting ? 'Logging in...' : 'Login'}
         </button>
       </form>

@@ -5,11 +5,11 @@ A step-by-step plan for building the React + Tailwind SPA against the existing S
 - [x] Phase 0 — Backend prerequisite fixes (**DONE**)
 - [x] Phase 1 — Frontend foundation
 - [x] Phase 2 — Auth (register/login)
-- [ ] Phase 3 — Vehicle dashboard (browse/search)
-- [ ] Phase 4 — Purchase flow
-- [ ] Phase 5 — Admin vehicle management
-- [ ] Phase 6 — Admin stats dashboard
-- [ ] Phase 7 — Polish & final QA
+- [x] Phase 3 — Vehicle dashboard (browse/search)
+- [x] Phase 4 — Purchase flow
+- [x] Phase 5 — Admin vehicle management
+- [x] Phase 6 — Admin stats dashboard
+- [x] Phase 7 — Polish & final QA
 
 ---
 

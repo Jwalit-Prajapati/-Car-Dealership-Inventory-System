@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { register } from '../api/auth';
 import { ApiError } from '../api/client';
 import { useToast } from '../components/ToastProvider';
+import Spinner from '../components/Spinner';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -117,8 +118,9 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 disabled:opacity-50"
         >
+          {submitting && <Spinner />}
           {submitting ? 'Registering...' : 'Register'}
         </button>
       </form>

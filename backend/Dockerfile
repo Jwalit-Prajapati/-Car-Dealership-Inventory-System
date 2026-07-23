@@ -14,8 +14,8 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
-# Copy the built jar file
-COPY --from=builder /app/target/*.jar app.jar
+# Copy the built artifact (packaged as .war, but Spring Boot repackages it as an executable archive runnable via `java -jar`)
+COPY --from=builder /app/target/*.war app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1450,3 +1450,41 @@ Read `frontend-plan.md` and found Phase 1 partially started from the prior sessi
 - Verified `npx eslint src` passes clean, started the Vite dev server, and curled `/`, `/login`, `/register` plus each new module's dev-server transform to confirm the app boots and every route resolves without compile errors.
 
 Checked off Phase 1 in `frontend-plan.md`. Flagged that a real-browser visual check (Tailwind styles rendering correctly) is still worth doing since only server-side compilation was verified, not visual output.
+
+## 2026-07-23T~12:15–14:30+05:30 (reconstructed)
+
+**Note:** This entry covers a conversation that ran in a session cleared with `/clear` before this logging request was made, so the exact prompt/response text isn't available. This summary is reconstructed from `frontend-plan.md`'s checkbox state (Phases 2–7 all now marked done) and the diffs/new files left behind in `frontend/src/`.
+
+**User Prompt:**
+Asked to continue through the remaining phases of `frontend-plan.md` (Phase 2 through Phase 7) — auth pages, the vehicle dashboard, the purchase flow, admin vehicle management, the admin stats dashboard, and a final polish/QA pass.
+
+**AI Response:**
+Completed Phases 2–7 of the frontend build:
+- **Phase 2 (Auth):** Built `LoginPage` and `RegisterPage` with client-side validation, wired to `AuthContext`; extended `Navbar.jsx` to show role-aware links (Admin-only `/admin/vehicles` and `/admin/stats`) and a logout control; added `ToastProvider.jsx` for global success/error toasts.
+- **Phase 3 (Dashboard):** Built `DashboardPage.jsx`, `VehicleCard.jsx`, `VehicleGrid.jsx`, `SearchFilterBar.jsx`, and `PaginationControls.jsx` — browsing and searching `GET /api/vehicles` / `GET /api/vehicles/search` with make/model/category/price filters and pagination.
+- **Phase 4 (Purchase flow):** Built `PurchaseModal.jsx` with a stock-capped quantity stepper, wired to `POST /api/purchases`, with local stock updates on success instead of a full refetch.
+- **Phase 5 (Admin vehicle management):** Built `AdminVehiclesPage.jsx`, `VehicleFormModal.jsx` (shared create/edit form), and `ConfirmDialog.jsx`, covering create/edit/delete/restock end-to-end for `ADMIN`-only routes.
+- **Phase 6 (Admin stats):** Built `AdminStatsPage.jsx` and `StatCard.jsx`, fetching `/api/admin/stats/inventory` and `/api/admin/stats/sales` in parallel and rendering a highlighted "Most Purchased Vehicle" card.
+- **Phase 7 (Polish & QA):** Added `Spinner.jsx` and `ErrorBoundary.jsx`, a responsive pass across the grid/nav/forms, a consistent Tailwind theme, and a new favicon (`frontend/public/favicon.svg`, `frontend/index.html`).
+
+All seven phases checked off in `frontend-plan.md`. Backend: `VehicleController.java`'s `GET /api/vehicles` and `GET /api/vehicles/search` endpoints had `sort = "id"` added to their `@PageableDefault`/`Pageable` handling so pagination returns vehicles in a stable order for the dashboard.
+
+## 2026-07-23T15:20:05+05:30
+
+**User Prompt:**
+1. Run the frontend on Docker too — create a Dockerfile for it, move `docker-compose.yml` from `backend/` to the project root, and configure the frontend and backend together in it. 2. Update `PROMPTS.md` with the last few conversations that weren't logged yet. 3. After 1 and 2, commit the project to GitHub.
+
+**AI Response:**
+Asked whether the dockerized frontend should reach the backend via an nginx reverse proxy (same-origin, no CORS changes needed) or by calling the backend directly from the browser (requires adding the frontend's docker origin to CORS). User chose the reverse-proxy approach.
+
+Implemented:
+1. `frontend/src/api/client.js` — `BASE_URL` now falls back to `window.location.origin` when `VITE_API_BASE_URL` isn't set, so the built app works same-origin behind the proxy.
+2. `frontend/Dockerfile` — multi-stage build: `node:20-alpine` builds the Vite app, `nginx:1.27-alpine` serves the static `dist/` output.
+3. `frontend/nginx.conf` — serves the SPA with a `try_files` fallback to `index.html` for client-side routing, and reverse-proxies `/api/` to `http://backend:8080/api/` inside the compose network so browser calls stay same-origin.
+4. `frontend/.dockerignore` and `backend/.dockerignore` added.
+5. Moved `backend/docker-compose.yml` → `docker-compose.yml` (root, via `git mv`); renamed the backend service from `app` to `backend` (matches the nginx proxy's upstream hostname), set its build context to `./backend`, and added a `frontend` service (build context `./frontend`, published on host port `3000`, `depends_on: backend`). Removed the obsolete `version: '3.8'` key.
+6. Found and fixed a pre-existing bug while verifying the stack: `backend/pom.xml` uses `<packaging>war</packaging>`, so Maven produces `target/*.war`, not `*.jar` — `backend/Dockerfile`'s `COPY --from=builder /app/target/*.jar app.jar` silently copied nothing (no build error), leaving `/app/app.jar` missing at runtime (`Error: Unable to access jarfile app.jar`). Changed the glob to `*.war` — Spring Boot's repackaged war is directly executable via `java -jar` regardless of file extension.
+7. Verified the full stack for real: ran `docker compose build` (both images build clean) and `docker compose up -d` with temporary host-port overrides (host `8080`/`5432` were already in use by the user's local dev backend/Postgres), then confirmed: backend boots and connects to Postgres; `GET /` on the frontend container returns the SPA (200); `GET /api/vehicles` through the frontend's nginx proxy returns live JSON from the backend (200); SPA deep links (`/login`, `/admin/vehicles`) resolve via the `try_files` fallback (200). Tore the test stack down afterward and removed the temporary override file.
+8. Updated `README.md`'s "Local Development Setup" section: removed the `cd backend` prefix from the `docker-compose` commands (compose file now lives at root), documented running the frontend dev server (`npm run dev`) alongside the native backend, and documented the full containerized stack (`docker-compose up -d --build`) with its port mapping and reverse-proxy behavior.
+
+Awaiting the PROMPTS.md update (this entry) and the commit to GitHub.

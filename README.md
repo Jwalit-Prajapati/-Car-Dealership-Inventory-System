@@ -39,14 +39,14 @@ The application follows a standard layered architecture:
 
 ### Prerequisites
 - JDK 17
-- Docker and Docker Compose (to run the PostgreSQL database)
+- Node.js 20+ (only for running the frontend outside Docker)
+- Docker and Docker Compose
 
 ### Local Development Setup
 
 1. **Start the Database**
-   The project includes a `docker-compose.yml` file to quickly spin up a PostgreSQL instance.
+   The project includes a root-level `docker-compose.yml` to quickly spin up a PostgreSQL instance.
    ```bash
-   cd backend
    docker-compose up -d db
    ```
 
@@ -56,9 +56,9 @@ The application follows a standard layered architecture:
    openssl rand -base64 32
    export JWT_SECRET=<paste generated value>   # PowerShell: $env:JWT_SECRET = "<value>"
    ```
-   (This is only needed when running the app directly via `mvnw`/step 3 below — `docker-compose up -d` in step 4 already sets `JWT_SECRET` for the containerized app.)
+   (This is only needed when running the backend directly via `mvnw`/step 3 below — `docker-compose up -d` in step 4 already sets `JWT_SECRET` for the containerized app.)
 
-3. **Run the Application**
+3. **Run the Backend**
    Use the included Maven wrapper to start the Spring Boot application.
    ```bash
    cd backend
@@ -66,12 +66,21 @@ The application follows a standard layered architecture:
    ```
    The application will automatically connect to the local PostgreSQL database, apply Flyway migrations, and start on port `8080`.
 
-4. **Run via Docker Compose (Full Stack)**
-   Alternatively, you can run both the database and the application as containers:
+   To run the frontend against it, in a separate terminal:
    ```bash
-   cd backend
-   docker-compose up -d
+   cd frontend
+   npm install
+   npm run dev
    ```
+   The SPA starts on port `5173` and talks to the backend at `http://localhost:8080` (`frontend/.env` → `VITE_API_BASE_URL`).
+
+4. **Run via Docker Compose (Full Stack)**
+   Alternatively, run the database, backend, and frontend together as containers from the project root:
+   ```bash
+   docker-compose up -d --build
+   ```
+   - Backend: `http://localhost:8080`
+   - Frontend: `http://localhost:3000` — served by nginx, which also reverse-proxies `/api/*` to the backend container, so the browser never makes cross-origin calls.
 
 ## Testing
 This project embraces Test-Driven Development (TDD) with isolated, fast-running tests. Persistence layer tests are backed by Testcontainers for true database verification without mocking the database engine.

@@ -46,14 +46,14 @@ public class VehicleController {
 
     @GetMapping
     public ResponseEntity<Page<VehicleResponseDTO>> getVehicles(
-            Pageable pageable) {
+            @PageableDefault(sort = "id") Pageable pageable) {
         return ResponseEntity.ok(vehicleService.getVehicles(pageable));
     }
 
     @GetMapping("/search")
     public ResponseEntity<Page<VehicleResponseDTO>> searchVehicles(
             @Valid @ModelAttribute VehicleSearchRequest request,
-            @PageableDefault(size = 10) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return ResponseEntity.ok(vehicleService.searchVehicles(
                 request, 
                 pageable));

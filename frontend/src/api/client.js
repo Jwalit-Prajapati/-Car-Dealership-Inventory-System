@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || window.location.origin;
 
 export class ApiError extends Error {
   constructor(message, status) {
@@ -24,11 +24,16 @@ async function request(method, path, { body, params } = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let response;
+  try {
+    response = await fetch(url, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    throw new ApiError("Can't reach the server. Please check your connection and try again.", 0);
+  }
 
   if (response.status === 204) {
     return null;
