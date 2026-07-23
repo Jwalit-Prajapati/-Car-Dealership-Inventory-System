@@ -50,7 +50,15 @@ The application follows a standard layered architecture:
    docker-compose up -d db
    ```
 
-2. **Run the Application**
+2. **Set required environment variables**
+   The app reads its JWT signing key from `JWT_SECRET` (`backend/src/main/resources/application.yml`) — there is no default, so the app won't boot without it. It must be **base64-encoded** (it's decoded as a key, not used as raw text). Generate one and export it before running natively:
+   ```bash
+   openssl rand -base64 32
+   export JWT_SECRET=<paste generated value>   # PowerShell: $env:JWT_SECRET = "<value>"
+   ```
+   (This is only needed when running the app directly via `mvnw`/step 3 below — `docker-compose up -d` in step 4 already sets `JWT_SECRET` for the containerized app.)
+
+3. **Run the Application**
    Use the included Maven wrapper to start the Spring Boot application.
    ```bash
    cd backend
@@ -58,7 +66,7 @@ The application follows a standard layered architecture:
    ```
    The application will automatically connect to the local PostgreSQL database, apply Flyway migrations, and start on port `8080`.
 
-3. **Run via Docker Compose (Full Stack)**
+4. **Run via Docker Compose (Full Stack)**
    Alternatively, you can run both the database and the application as containers:
    ```bash
    cd backend

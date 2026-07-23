@@ -15,5 +15,7 @@ spring:
         max-page-size: 100
 
 jwt:
+  # Required, no default. Must be a base64-encoded key (JwtService decodes it, not raw text) —
+  # generate with `openssl rand -base64 32`. See README "Set required environment variables".
   secret: ${JWT_SECRET}
   expiration: 86400000

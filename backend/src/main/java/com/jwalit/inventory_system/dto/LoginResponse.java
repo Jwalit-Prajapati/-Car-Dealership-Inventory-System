@@ -1,3 +1,3 @@
 package com.jwalit.inventory_system.dto;
 
-public record LoginResponse(String token) {}
+public record LoginResponse(String token, String role, String fullName) {}

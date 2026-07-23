@@ -116,3 +116,10 @@ Never create commits automatically.
 Only commit after I explicitly approve the current phase or instruct you to proceed.
 Follow the Git Commit Message policy above. and perform a `git push` after each commit.
 
+## Rules for Frontend only
+## Ground rules for every phase
+
+- **Stack, strictly**: React (Vite), Tailwind CSS, `react-router-dom` for routing, native `fetch` for HTTP. No Redux, no axios, no UI kit, no form libraries — hand-rolled with React state/Context.
+- **No new dependencies** beyond `react-router-dom` (already decided) without asking first.
+- After finishing a phase, run it in the browser and verify the phase's checkpoint before moving to the next phase.
+- Keep components in the folder structure below — don't invent a different structure mid-way.

@@ -5,6 +5,7 @@ import com.jwalit.inventory_system.dto.LoginResponse;
 import com.jwalit.inventory_system.dto.RegistrationRequest;
 import com.jwalit.inventory_system.entity.Role;
 import com.jwalit.inventory_system.entity.User;
+import com.jwalit.inventory_system.security.CustomUserDetails;
 import com.jwalit.inventory_system.security.JwtService;
 import com.jwalit.inventory_system.repository.UserRepository;
 import com.jwalit.inventory_system.mapper.UserMapper;
@@ -19,11 +20,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -100,16 +104,25 @@ class AuthServiceTest {
     @Test
     void login_validCredentials_returnsJwt() {
         LoginRequest request = new LoginRequest("user@example.com", "password123");
+        User user = new User();
+        user.setFirstName("Jane");
+        user.setLastName("Doe");
+        user.setEmail("user@example.com");
+        user.setRole(Role.USER);
+
         org.springframework.security.core.Authentication auth = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
         given(auth.getName()).willReturn("user@example.com");
+        given(auth.getPrincipal()).willReturn(new CustomUserDetails(user));
 
         given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).willReturn(auth);
-        given(jwtService.generateToken("user@example.com")).willReturn("jwt-token");
+        given(jwtService.generateToken(anyMap(), eq("user@example.com"))).willReturn("jwt-token");
 
         LoginResponse response = authService.login(request);
-        
+
         assertThat(response).isNotNull();
         assertThat(response.token()).isEqualTo("jwt-token");
+        assertThat(response.role()).isEqualTo("USER");
+        assertThat(response.fullName()).isEqualTo("Jane Doe");
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 

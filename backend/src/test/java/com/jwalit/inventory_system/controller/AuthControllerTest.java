@@ -139,7 +139,7 @@ class AuthControllerTest {
         }
         """;
         
-        org.mockito.BDDMockito.given(authService.login(any(LoginRequest.class))).willReturn(new LoginResponse("fake-jwt-token"));
+        org.mockito.BDDMockito.given(authService.login(any(LoginRequest.class))).willReturn(new LoginResponse("fake-jwt-token", "USER", "Test User"));
 
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)

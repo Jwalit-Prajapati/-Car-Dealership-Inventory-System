@@ -1413,3 +1413,40 @@ commit now
 
 **AI Response:**
 I have updated `PROMPTS.md` and initiated the `git commit` and `git push` commands to save our new monorepo structure to GitHub.
+
+## 2026-07-23T~10:00–11:13+05:30 (reconstructed)
+
+**Note:** This entry covers a conversation that ran in a session cleared with `/clear` before this logging request was made, so the exact prompt/response text isn't available. This summary is reconstructed from the resulting files and diffs left behind (`frontend-plan.md`, the uncommitted backend changes, and the partially-scaffolded `frontend/` directory).
+
+**User Prompt:**
+Asked for a step-by-step build plan for the React + Tailwind frontend against the existing Spring Boot backend, structured so each phase could be handed to a fresh conversation. Also asked to fix any backend prerequisites needed before frontend work could start (CORS, login response shape for role-based UI).
+
+**AI Response:**
+Created `frontend-plan.md` at the project root defining Phase 0 through Phase 7 (backend prereqs, frontend foundation, auth, vehicle dashboard, purchase flow, admin vehicle management, admin stats dashboard, polish/QA), including a verified backend API reference table, response shapes, and client-side validation rules to mirror (since the backend only returns a generic "Validation failed" message).
+
+Completed Phase 0 (backend prerequisite fixes) directly:
+- `SecurityConfig.java` — added a `CorsConfigurationSource` bean allowing origin `http://localhost:5173`.
+- `LoginResponse` — changed from `{token}` to `{token, role, fullName}`; `AuthService.login` and `TokenService`/`JwtService` updated so the JWT embeds the user's role.
+- `backend/pom.xml` — fixed a pre-existing Testcontainers 2.x artifact-id break (`junit-jupiter`→`testcontainers-junit-jupiter`, `postgresql`→`testcontainers-postgresql`).
+- Updated `AuthServiceTest` and `AuthControllerTest` for the new `LoginResponse` shape; confirmed 136/136 backend tests passing.
+
+Also began Phase 1 groundwork in `frontend/`: installed `tailwindcss`, `@tailwindcss/vite`, and `react-router-dom`; wired `tailwindcss()` into `vite.config.js`; replaced `src/index.css` with the Tailwind import; and added `.env`/`.env.example` with `VITE_API_BASE_URL`. The session ended (context cleared) before the remaining Phase 1 folder structure, routing, and API/auth plumbing were built.
+
+## 2026-07-23T12:03:04+05:30
+
+**User Prompt:**
+Read the frontend-plan.md and start with phase 1
+
+**AI Response:**
+Read `frontend-plan.md` and found Phase 1 partially started from the prior session (Tailwind/react-router-dom installed, `vite.config.js` and `index.css` already wired, `.env`/`.env.example` present). Completed the rest of Phase 1:
+
+- Deleted leftover Vite template cruft (`App.css`, `react.svg`, `vite.svg`, `hero.png`, `public/icons.svg`).
+- Built the `api/` layer: `client.js` (fetch wrapper with auth-header injection, 204 handling, an `ApiError` that extracts `message` from the backend's `ApiResponse` error envelope), plus `auth.js`, `vehicles.js`, `purchases.js`, `stats.js` covering every documented endpoint.
+- Built `context/AuthContext.jsx` — `{token, role, fullName}` persisted to `localStorage`, `login()`/`logout()`, `isAuthenticated`/`isAdmin` — verified against `VehicleController.java`, `AuthController.java`, `ApiResponse.java`, and `GlobalExceptionHandler.java` to confirm success responses return raw DTOs while only errors are wrapped.
+- Built `routes/ProtectedRoute.jsx` and `routes/AdminRoute.jsx` redirect guards.
+- Built `components/Navbar.jsx` (auth-aware nav) and placeholder pages: `LoginPage`, `RegisterPage`, `DashboardPage`, `AdminVehiclesPage`, `AdminStatsPage`.
+- Wired `main.jsx` (`BrowserRouter` + `AuthProvider`) and `App.jsx` (routes: `/`, `/login`, `/register` public; `/admin/*` behind `AdminRoute`).
+- Fixed one lint error (`react-refresh/only-export-components` on `AuthContext.jsx`, a common false-positive for colocated context+hook files) with a targeted disable comment.
+- Verified `npx eslint src` passes clean, started the Vite dev server, and curled `/`, `/login`, `/register` plus each new module's dev-server transform to confirm the app boots and every route resolves without compile errors.
+
+Checked off Phase 1 in `frontend-plan.md`. Flagged that a real-browser visual check (Tailwind styles rendering correctly) is still worth doing since only server-side compilation was verified, not visual output.
