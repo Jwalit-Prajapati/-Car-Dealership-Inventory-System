@@ -46,12 +46,14 @@ The application follows a standard layered architecture:
 1. **Start the Database**
    The project includes a `docker-compose.yml` file to quickly spin up a PostgreSQL instance.
    ```bash
+   cd backend
    docker-compose up -d db
    ```
 
 2. **Run the Application**
    Use the included Maven wrapper to start the Spring Boot application.
    ```bash
+   cd backend
    ./mvnw spring-boot:run
    ```
    The application will automatically connect to the local PostgreSQL database, apply Flyway migrations, and start on port `8080`.
@@ -59,6 +61,7 @@ The application follows a standard layered architecture:
 3. **Run via Docker Compose (Full Stack)**
    Alternatively, you can run both the database and the application as containers:
    ```bash
+   cd backend
    docker-compose up -d
    ```
 
@@ -67,6 +70,7 @@ This project embraces Test-Driven Development (TDD) with isolated, fast-running 
 
 Run the test suite using:
 ```bash
+cd backend
 ./mvnw test
 ```
 
